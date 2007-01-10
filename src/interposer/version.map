@@ -1,0 +1,20 @@
+{ global: 
+    vfprintf;
+    vprintf;
+    fputc;
+    fputs;
+    putc;
+    putchar;
+    puts;
+    write;
+    writev;
+    pwrite;
+    fwrite;
+    fwrite_unlocked;
+    fputs_unlocked;
+    _IO_putc;
+    _IO_puts;
+
+  local: 
+     *;
+};

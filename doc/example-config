@@ -1,0 +1,29 @@
+# 
+# IO Watchdog configuration file format:
+#
+# search `dir' [dir2 ...] Add a list of paths to search for actions
+# action name = command   Define a new action [name]
+# 
+# timeout = N             Define default timeout 
+# rank = N                Define default rank
+# target = glob           Define default target
+# actions = action,...    Define default list of actions
+#
+# program pattern         Following settings only apply to programs
+#                          that match [pattern] (globbing pattern).
+#
+
+# Define action "email" to run hang-email.pl script
+action email = /usr/local/share/io-watchdog/hang-email.pl
+
+timeout = 1.5h  # Default timeout of 90 minutes
+actions = email # Default action is "email"
+
+#  Now make different defaults for "myapp"
+#
+program myapp
+  timeout = 30m
+  target = *myapp*  # Only target processes matching "*myapp*"
+
+  actions = email /usr/local/share/io-watchdog/parallel-debugger.pl
+

@@ -1,0 +1,9 @@
+{ global: 
+     spank*;
+	 plugin_name;
+	 plugin_type;
+	 plugin_version;
+	 slurm_spank*;
+  local: 
+     *;
+};
