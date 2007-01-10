@@ -1,4 +1,6 @@
 2007-01-10  Mark Grondona  <mgrondona@llnl.gov>
+	* src/watchdog/io-watchdog.c : 
+	  Exit io-watchdog server if application has already exited.
 
 	* src/conf/conf.c, src/conf/conf.h, src/conf/Makefile.am,
 	  src/spank/io-watchdog.c, src/interposer/io-watchdog-interposer.c,

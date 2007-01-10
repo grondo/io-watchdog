@@ -709,10 +709,9 @@ static int invoke_watchdog_action (struct prog_ctx *ctx)
 
 static void wait_for_application (struct prog_ctx *ctx)
 {
-    log_debug2 ("wait_for_application: started = %d\n", ctx->shared->started);
+    log_debug2 ("waiting for application...\n");
     while (!ctx->shared->started)
         xnanosleep (0.5);
-    log_debug2 ("wait_for_application: started = %d\n", ctx->shared->started);
 }
 
 static int io_watchdog_server (struct prog_ctx *ctx)
@@ -728,6 +727,9 @@ static int io_watchdog_server (struct prog_ctx *ctx)
     log_verbose ("server process (%ld) started with timeout = (%s%s) %.3fs\n", 
                  getpid (), ctx->opts.timeout_string, timeout_units (ctx),
                  ctx->opts.timeout);
+
+    if (ctx->shared->exited)
+        exit (0);
 
     for (;;) {
         ctx->shared->flag = 0;
@@ -747,7 +749,7 @@ static int io_watchdog_server (struct prog_ctx *ctx)
 
     } 
 
-    return (0);
+    exit (0);
 }
 
 static int shared_region_create (struct prog_ctx *ctx)
