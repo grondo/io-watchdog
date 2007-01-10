@@ -12,7 +12,8 @@ io_watchdog_interposer_la_LDFLAGS = \
 io_watchdog_interposer_la_LIBADD = \
     -ldl \
     $(top_srcdir)/src/lib/log_msg.lo \
-    $(top_srcdir)/src/lib/shared.lo 
+    $(top_srcdir)/src/lib/shared.lo \
+    $(top_srcdir)/src/conf/paths.lo
 
 
 io_watchdog_interposer_la_SOURCES = \

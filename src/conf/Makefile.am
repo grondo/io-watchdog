@@ -12,6 +12,9 @@ libconf_la_SOURCES = \
 	conf.h \
 	conf.c
 
+nodist_libconf_la_SOURCES = \
+	paths.c
+
 libconf_la_LIBADD = \
 	$(top_srcdir)/src/lib/libcommon.la -lfl 
 
@@ -31,6 +34,10 @@ conf-lexer.c : conf-parser.l
 conf-parser.c : conf-parser.y
 	$(YACC) -d -oconf-parser.c conf-parser.y
 
+paths.c : $(top_srcdir)/META $(top_builddir)/config.h
+	@(echo "const char *io_watchdog_path = \"$(bindir)/io-watchdog\";" \
+	 )> paths.c
+
 EXTRA_DIST = \
 	conf-parser.l \
 	conf-parser.y
@@ -38,4 +45,6 @@ EXTRA_DIST = \
 CLEANFILES = \
 	conf-parser.h \
 	conf-parser.c \
-	conf-lexer.c
+	conf-lexer.c \
+	paths.c
+	

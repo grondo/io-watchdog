@@ -1,3 +1,10 @@
 2007-01-10  Mark Grondona  <mgrondona@llnl.gov>
 
+	* src/conf/conf.c, src/conf/conf.h, src/conf/Makefile.am,
+	  src/spank/io-watchdog.c, src/interposer/io-watchdog-interposer.c,
+	  src/interposer/Makefile.am :
+	  Remove references to /usr/bin/io-watchdog and replace with
+	  io_watchdog_path which is determined at build-time based
+	  on --prefix.	  
+
 	* : Intial commit.

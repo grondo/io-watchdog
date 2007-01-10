@@ -189,11 +189,12 @@ static int log_output_fn (const char *buf)
     return ((*ctx.ops.fputs) (buf, stderr));
 }
 
+extern const char *io_watchdog_path;
+
 static void spawn_watchdog ()
 {
     pid_t pid;
     char *args [] = { "io-watchdog", "--server", "-F", NULL, NULL };
-    const char path [] = "/home/grondo/proj/io-watchdog/src/watchdog/io-watchdog";
 
     unsetenv ("LD_PRELOAD");
 
@@ -206,8 +207,8 @@ static void spawn_watchdog ()
 
     io_watchdog_shared_region_destroy (ctx.shared_region);
 
-    if (execv (path, args) < 0)
-        log_err ("exec: %s: %s\n", path, strerror (errno));
+    if (execv (io_watchdog_path, args) < 0)
+        log_err ("exec: %s: %s\n", io_watchdog_path, strerror (errno));
     exit (1);
 }
 

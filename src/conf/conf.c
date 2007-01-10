@@ -538,6 +538,13 @@ const char * io_watchdog_conf_target (io_watchdog_conf_t conf)
     return (target);
 }
 
+extern const char *io_watchdog_path;
+
+const char * io_watchdog_server_path ()
+{
+    return (io_watchdog_path);
+}
+
 
 static int apply_suffix (double *x, char suffix_char)
 {

@@ -59,7 +59,8 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 io_watchdog_interposer_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/lib/log_msg.lo \
-	$(top_srcdir)/src/lib/shared.lo
+	$(top_srcdir)/src/lib/shared.lo \
+	$(top_srcdir)/src/conf/paths.lo
 am_io_watchdog_interposer_la_OBJECTS = io-watchdog-interposer.lo
 io_watchdog_interposer_la_OBJECTS =  \
 	$(am_io_watchdog_interposer_la_OBJECTS)
@@ -205,7 +206,8 @@ io_watchdog_interposer_la_LDFLAGS = \
 io_watchdog_interposer_la_LIBADD = \
     -ldl \
     $(top_srcdir)/src/lib/log_msg.lo \
-    $(top_srcdir)/src/lib/shared.lo 
+    $(top_srcdir)/src/lib/shared.lo \
+    $(top_srcdir)/src/conf/paths.lo
 
 io_watchdog_interposer_la_SOURCES = \
     io-watchdog-interposer.c

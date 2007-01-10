@@ -231,7 +231,7 @@ static int spawn_watchdog (spank_t sp)
 
     args [3] = strdup (opts.shared_filename);
 
-    if (execve ("/usr/bin/io-watchdog", args, env) < 0)
+    if (execve (io_watchdog_server_path (), args, env) < 0)
         slurm_error ("io-watchdog: execve (%s): %m", args [0]);
 
     exit (1);

@@ -5,6 +5,8 @@
 
 typedef struct io_watchdog_conf * io_watchdog_conf_t;
 
+const char * io_watchdog_server_path ();
+
 io_watchdog_conf_t io_watchdog_conf_create (void);
 void io_watchdog_conf_destroy (io_watchdog_conf_t conf);
 
@@ -38,5 +40,6 @@ const char * io_watchdog_conf_find_action (io_watchdog_conf_t conf, char *name);
 void io_watchdog_conf_debug ();
 
 int parse_timeout_string (const char *s, double *dp, int *has_suffix);
+
 
 #endif /* !_HAVE_CONF_H */
