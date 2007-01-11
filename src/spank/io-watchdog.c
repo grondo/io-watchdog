@@ -190,6 +190,9 @@ static int set_process_environment (spank_t sp)
     char buf [1024];
     int len = sizeof (buf);
 
+    if (do_setenv (sp, "IO_WATCHDOG_SHARED_FILE", opts.shared_filename) < 0)
+        return (-1);
+
     if (spank_getenv (sp, "LD_PRELOAD", buf, len) == ESPANK_SUCCESS) 
         strncat (buf, " io-watchdog-interposer.so", len - strlen (buf));
     else

@@ -2,6 +2,9 @@
 
 	* : tag v0.2. 
 
+	* src/spank/io-watchdog.c :
+	  Be sure to export IO_WATCHDOG_SHARED_FILE to task.
+
 	* src/watchdog/io-watchdog.c :
 	  Unset IO_WATCHDOG_CONFIG from action environment.
 
