@@ -185,6 +185,19 @@ static int do_setenv (spank_t sp, const char *name, const char *val)
     return (0);
 }
 
+static int set_process_environment (spank_t sp)
+{
+    char buf [1024];
+    int len = sizeof (buf);
+
+    if (spank_getenv (sp, "LD_PRELOAD", buf, len) == ESPANK_SUCCESS) 
+        strncat (buf, " io-watchdog-interposer.so", len - strlen (buf));
+    else
+        strncpy (buf, "io-watchdog-interposer.so", len);
+
+    return (do_setenv (sp, "LD_PRELOAD", buf));
+}
+
 static int set_watchdog_environment (spank_t sp)
 {
     if (opts.timeout) 
@@ -204,9 +217,9 @@ static int set_watchdog_environment (spank_t sp)
 
     if (opts.conf)
         do_setenv (sp, "IO_WATCHDOG_CONFIG", opts.conf);
+
     return (0);
 }
-
 
 static int spawn_watchdog (spank_t sp)
 {
@@ -215,50 +228,23 @@ static int spawn_watchdog (spank_t sp)
 
     char *args [] = { "io-watchdog", "--server", "-F", NULL, NULL };
 
-    if ((pid = fork ()) < 0)
-        return (-1);
-    if (pid > 0)
-        return (0);
-
-    set_watchdog_environment (sp);
+    args [3] = opts.shared_filename;
 
     if (spank_get_item (sp, S_JOB_ENV, &env) != ESPANK_SUCCESS) {
         slurm_error ("io-watchdog: Failed to get process environment\n");
         return (-1);
     }
 
-    slurm_verbose ("Spawning io-watchdog\n");
+    if ((pid = fork ()) < 0)
+        return (-1);
+    if (pid > 0)
+        return (0);
 
-    args [3] = strdup (opts.shared_filename);
 
     if (execve (io_watchdog_server_path (), args, env) < 0)
         slurm_error ("io-watchdog: execve (%s): %m", args [0]);
 
     exit (1);
-}
-
-static int set_target_environment (spank_t sp)
-{
-    char buf [1024];
-    int len = sizeof (buf);
-
-    if (spank_getenv (sp, "LD_PRELOAD", buf, len) == ESPANK_SUCCESS) 
-        strncat (buf, " io-watchdog-interposer.so", len - strlen (buf));
-    else
-        strncpy (buf, "io-watchdog-interposer.so", len);
-
-    if (spank_setenv (sp, "LD_PRELOAD", buf, 1) != ESPANK_SUCCESS) {
-        slurm_error ("Failed to set LD_PRELOAD in environment");
-        return (-1);
-    }
-
-    if (opts.target)
-        do_setenv (sp, "IO_WATCHDOG_TARGET", opts.target);
-
-    if (opts.debug)
-        do_setenv (sp, "IO_WATCHDOG_DEBUG", opts.debug);
-
-    return (0);
 }
 
 static int read_and_apply_config (spank_t sp, io_watchdog_conf_t conf)
@@ -316,9 +302,14 @@ int slurm_spank_task_init (spank_t sp, int ac, char **av)
     }
 
     opts.shared_filename = shared_filename_create (sp);
+
+    set_watchdog_environment (sp);
+
     spawn_watchdog (sp);
 
-    return (set_target_environment (sp));
+    set_process_environment (sp);
+
+    return (0);
 }
 
 /*

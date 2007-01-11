@@ -661,6 +661,7 @@ static void setup_server_environment (struct prog_ctx *ctx)
     unsetenv ("IO_WATCHDOG_TARGET");
     unsetenv ("IO_WATCHDOG_TIMEOUT");
     unsetenv ("IO_WATCHDOG_ACTION");
+    unsetenv ("IO_WATCHDOG_CONFIG");
     unsetenv ("IO_WATCHDOG_SHARED_FILE");
 
     /*
