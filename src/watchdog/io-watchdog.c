@@ -47,7 +47,7 @@ Usage: %s [OPTIONS] [executable args...]\n\
   -t, --timeout=N[smhd]  Set watchdog timeout to [N] seconds. Suffix may be\n\
                           s for seconds, m minutes, h hours, or d days. [N]\n\
                           may be an arbitrary floating-point number.\n\
-  -a, --action=script,... Run action [script] on watchdog trigger. More than\n\
+  -a, --action=script,.. Run action [script] on watchdog trigger. More than\n\
                           one action may be specified.\n\
   -T, --target=glob      Only target processes with names matching the shell\n\
                           globbing pattern [glob] (See glob(7)). This is \n\
