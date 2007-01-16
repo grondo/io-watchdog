@@ -19771,7 +19771,7 @@ fi
 
 CFLAGS="-g -Wall"
 
-                                                                      ac_config_files="$ac_config_files Makefile src/Makefile src/lib/Makefile src/conf/Makefile src/spank/Makefile src/watchdog/Makefile src/interposer/Makefile"
+                                                                                          ac_config_files="$ac_config_files Makefile src/Makefile src/lib/Makefile src/conf/Makefile src/conf/io-watchdog.conf.5 src/spank/Makefile src/watchdog/Makefile src/watchdog/io-watchdog.1 src/interposer/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -20341,8 +20341,10 @@ do
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "src/lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/lib/Makefile" ;;
   "src/conf/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/conf/Makefile" ;;
+  "src/conf/io-watchdog.conf.5" ) CONFIG_FILES="$CONFIG_FILES src/conf/io-watchdog.conf.5" ;;
   "src/spank/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/spank/Makefile" ;;
   "src/watchdog/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/watchdog/Makefile" ;;
+  "src/watchdog/io-watchdog.1" ) CONFIG_FILES="$CONFIG_FILES src/watchdog/io-watchdog.1" ;;
   "src/interposer/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/interposer/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;

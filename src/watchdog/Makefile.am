@@ -5,6 +5,9 @@ INCLUDES = \
 bin_PROGRAMS = \
     io-watchdog
 
+man_MANS = \
+    io-watchdog.1
+
 io_watchdog_SOURCES = \
     io-watchdog.c
 

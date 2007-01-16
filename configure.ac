@@ -33,8 +33,10 @@ AC_CONFIG_FILES([
    src/Makefile
    src/lib/Makefile
    src/conf/Makefile
+   src/conf/io-watchdog.conf.5
    src/spank/Makefile
    src/watchdog/Makefile
+   src/watchdog/io-watchdog.1
    src/interposer/Makefile
  ]
 )

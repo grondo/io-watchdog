@@ -1,9 +1,11 @@
 INCLUDES = \
 	-I$(top_srcdir)/src/lib
 
+man_MANS = \
+    io-watchdog.conf.5
+
 noinst_LTLIBRARIES = \
 	libconf.la
-
 
 libconf_la_SOURCES = \
 	conf-parser.c \

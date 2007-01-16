@@ -1,0 +1,132 @@
+.\" $Id$
+
+.TH io-watchdog.conf 5 "@META_DATE@" "@META_ALIAS@" "IO Watchdog config file"
+
+.SH NAME
+io-watchdog.conf \- IO Watchdog configuration file
+
+.SH SYNOPSIS
+/etc/io-watchdog/io-watchdog.conf
+.br
+~/.io-watchdogrc
+
+.SH DESCRIPTION
+The io watchdog driver utility \fBio-watchdog\fR(1) along with the
+SLURM \fBio-watchdog\fR plugin obtain configuration data from
+the following sources:
+.PP
+.RS 8
+1. system configuration file: /etc/io-watchdog/io-watchdog.conf
+.br
+.ns
+2. user configuration file: ~/.io-watchdogrc
+.br
+.ns
+3. environment
+.br
+.ns
+4. command-line options
+.RE
+.PP
+Where the last value found overrides all others. Therefore, the
+command-line overrides the environment, which overrides the
+user configuration file and so on.
+.PP
+The configuration file has the following format:
+.PP
+Everything after a '#' character is considered a comment, and
+empty lines are ignored. Otherwise, each line of the config
+file should contain one of the following:
+.TP 8
+\fBtimeout\fR = \fIN\fR[\fISUFFIX\fR]
+Set the io watchdog timeout to \fIN\fR seconds. If \fISUFFIX\fR is supplied
+it can be 's' for seconds (the default), 'm' for minutes, 'h' for
+hours, or 'd' for days. N may be an arbitrary floating point 
+number.
+.TP
+\fBactions\fR = \fRNAME\fR[,\fINAME\fR,...]
+Set the list of IO watchdog actions to \fINAME\fR. Multiple actions
+may be specified as a comma or whitespace separated list.
+.TP
+\fBrank\fR = \fIN\fR
+Set the target rank for the IO watchdog to \fIN\fR.
+.TP
+\fBtarget\fR = \fIPATTERN\fR
+Only target processes matching the globbing pattern \fIPATTERN\fR.
+This is useful when running processes under other utlities such
+as \fBtime\fR(1) to avoid running the IO watchdog on the \fBtime\fR
+process. 
+.TP
+\fBsearch\fR \fIDIR\fR,...
+Prepend search directory list \fIDIR\fR,... to the list of paths
+to check for IO watchdog actions. Either whitespace or comma-delimted
+list is acceptable.
+.TP
+\fBaction\fR \fINAME\fR = \fISCRIPT\fR
+Define an action of \fINAME\fR to be the supplied \fISCRIPT\fR. \fISCRIPT\fR
+can also be a script with arguments, for example:
+
+ 'action name = "script args..."'
+.TP
+\fBprogram\fR \fIPATTERN\fR
+Define application specific settings for all programs whose
+names match the globbing pattern \fIPATTERN\fR. When a \fBprogram\fR
+section is encountered in the config file, all subsequent \fBtimeout\fR,
+\fBactions\fR, \fBrank\fR, and \fBtarget\fR settins will apply only to
+applications whose names match the given pattern. All \fBprogram\fR
+sections should appear at the end of the config file.
+
+.SH FILES
+.TP 8
+~/.io-watchdogrc
+This is the default user IO watchdog configuration file. It is read
+by default at startup unless a different config file is explictly 
+chosen by the user at runtime.
+.TP
+/etc/io-watchdog/io-watchdog.conf
+This is the system configuration file for the IO watchdog. System
+defaults and search paths for system supplied actions should be
+placed in this file. Settings in this file can be overridden by
+the user configuration and command-line.
+
+.SH EXAMPLES
+An example user configuration file follows:
+.nf
+#
+#  IO Watchdog config file
+#
+
+#  Search these directories for scripts that may be used
+#   as IO watchdog actions:
+
+search /home/grondo/bin, /home/grondo/scripts
+
+#  Some user-defined actions:
+
+action foo = /bin/date
+action bar = "/admin/scripts/jr -x $SLURM_JOBID"
+
+#  Defaults
+timeout = 0.5h
+rank = 0
+actions = foo
+
+#  Settings for specific programs
+
+program *myapp*
+   timeout = 5m
+   rank = 0
+   actions = email, foo, bar
+   # Target defaults to same pattern given in "program"
+   # statement above. 
+
+program *test*
+   timeout = 1.5s
+   # Use defaults for actions and rank etc.
+
+.fi
+
+.SH SEE ALSO
+\fBio-watchdog\fR(1)
+
+

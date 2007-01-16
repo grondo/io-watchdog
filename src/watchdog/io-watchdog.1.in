@@ -1,0 +1,70 @@
+.\" $Id$
+
+.TH IO-WATCHDOG 1 "@META_DATE@" "@META_ALIAS@" "IO Watchdog"
+
+.SH NAME
+io-watchdog \- IO Watchdog driver utility
+
+.SH SYNOPSIS
+.B io-watchdog
+[\fIOPTION\fR]... executable args...
+
+.SH DESCRIPTION
+The IO watchdog is a facility for monitoring user applications and 
+parallel jobs for hangs which typically have a side-effect of ceasing
+all IO in an application, particularly those that write to a log
+or data file in a cyclic fashion, such as once per compute cycle.
+The watchdog attempts to monitor all IO coming from an application
+and triggers a set of user-defined actions when IO has stopped
+for a configurable timeout period.
+.PP
+The \fBio-watchdog\fR utility is used to start applications under the
+IO watchdog service and configure watchdog parameters. This utility
+is typically needed when a job is run outside SLURM. When jobs
+are run under SLURM, the \-\-io-watchdog option to \fBsrun\fR(1)
+can be used when the io-watchdog plugin is enabled.
+
+.SH OPTIONS
+.TP
+.BI "-h, --help"
+Display a summary of the command-line options.
+.TP
+.BI "-v, --verbose"
+Increase the verbosity of the io watchdog.
+.TP
+.BI "-l, --list-actions"
+List pre-defined system and user actions then exit. System actions
+are those scripts found in the default search path, or any search
+paths added to the system io-watchdog.conf file.
+.TP
+.BI "-f, --config=" FILE
+Load configuration from file FILE. The config file specified 
+will override the default user config file ~/.io-watchdogrc. This
+option may be a convenient way to replace the use of other
+watchdog configuration options below.
+.TP
+.BI "-t, --timeout=" NUMBER[SUFFIX]
+Set watchdog timeout to NUMBER seconds. If supplied SUFFIX may be 's' 
+for seconds, 'm' for minutes, 'h' for hours, or 'd' for days.
+NUMBER may be an arbitrary floating-point number.
+.TP
+.BI "-a, --action=" SCRIPT,...
+Run action SCRIPT on watchdog trigger. More than one action
+may be specified. An action should be either a full patch to
+a script, one of the scripts in the default or user-defined
+search path, or an action defined in the config file as 
+
+ action name = "script args..."
+
+.TP
+.BI "-T, --target=" PATTERN
+Only target processes with names matching the shell globbing
+pattern PATTERN (See glob(7)). This option is useful when 
+running applications under other processes such as \fBtime\fR(1),
+as it avoids enabling the io watchdog on the \fBtime\fR process.
+.TP
+.BI "-r, --rank=" N
+Only target rank N (default = 0) of a SLURM job.
+
+.SH SEE ALSO
+\fBio-watchdog.conf\fR(5) 
