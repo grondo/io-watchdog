@@ -1,5 +1,7 @@
 2007-01-17  Mark Grondona  <mgrondona@llnl.gov>
 
+	* : tag v0.3.
+
 	* io-watchdog.spec :
 	  Conditionally include SLURM plugin.
 
