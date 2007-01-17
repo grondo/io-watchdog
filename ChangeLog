@@ -1,4 +1,15 @@
-2007-01-10  Mark Grondona  <mgrondona@llnl.gov>
+2007-01-17  Mark Grondona  <mgrondona@llnl.gov>
+
+	* configure, Makefile.in, src/Makefile.in, src/lib/Makefile.in,
+	  src/conf/Makefile.in, src/watchdog/Makefile.in, 
+	  src/interposer/Makefile.in, src/spank/Makefile.in :
+	  Re-run bootstrap.
+
+	* configure.ac, src/Makefile.am :
+	  Check for slurm/spank.h header file. Conditionally compile
+	  spank plugin only if spank header is found.
+
+2007-01-16  Mark Grondona  <mgrondona@llnl.gov>
 
 	* src/watchdog/io-watchdog.1.in, src/watchdog/Makefile.am,
 	  src/conf/io-watchdog.conf.5.in, src/conf/Makefile.am,

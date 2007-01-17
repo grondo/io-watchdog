@@ -55,7 +55,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = lib conf interposer watchdog spank
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
@@ -125,6 +125,8 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+WITH_SPANK_FALSE = @WITH_SPANK_FALSE@
+WITH_SPANK_TRUE = @WITH_SPANK_TRUE@
 YACC = @YACC@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
@@ -169,7 +171,8 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-SUBDIRS = lib conf interposer watchdog spank
+@WITH_SPANK_TRUE@SPANK = spank
+SUBDIRS = lib conf interposer watchdog $(SPANK)
 all: all-recursive
 
 .SUFFIXES:

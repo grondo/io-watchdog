@@ -25,7 +25,14 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_YACC
 AM_PROG_LEX
-
+#
+# Checks for headers
+#
+AC_CHECK_HEADERS(slurm/spank.h)
+AM_CONDITIONAL(WITH_SPANK, test x"${ac_cv_header_slurm_spank_h}" != xno)
+#
+#
+#
 CFLAGS="-g -Wall"
 
 AC_CONFIG_FILES([
