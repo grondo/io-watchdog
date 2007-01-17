@@ -39,9 +39,12 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 rm -f $RPM_BUILD_ROOT/%{_libdir}/*/*.{a,la}
 rm -f $RPM_BUILD_ROOT/%{_libdir}/*.{a,la}
 
-SLURM_LIBDIR=$RPM_BUILD_ROOT/%{_libdir}/slurm
-mkdir -p $SLURM_LIBDIR
-mv $RPM_BUILD_ROOT/%{_libdir}/io-watchdog.so $SLURM_LIBDIR
+PLUGIN=$RPM_BUILD_ROOT/%{_libdir}/io-watchdog.so
+if [ -f $PLUGIN ]; then
+   SLURM_LIBDIR=$RPM_BUILD_ROOT/%{_libdir}/slurm
+   mkdir -p $SLURM_LIBDIR
+   mv $PLUGIN $SLURM_LIBDIR
+fi
 
 ##############################################################################
 
