@@ -56,12 +56,15 @@ rm -rf "$RPM_BUILD_ROOT"
 %defattr(-,root,root)
 %doc COPYING ChangeLog README doc/example-config
 %{_bindir}/*
-%{_libdir}/*
-%{_libdir}/*/*
+%{_libdir}/io-watchdog-interposer.so
+%{_libdir}/slurm/*
 %{_mandir}/*/*
 
 ##############################################################################
 
 %changelog
+* Wed May 16 2007 Mark Grondona <mgrondona@llnl.gov>
+- fix %files section to avoid grabbing debug info.
+
 * Mon Jan  8 2007 Mark Grondona <mgrondona@llnl.gov>
 -Initial version.

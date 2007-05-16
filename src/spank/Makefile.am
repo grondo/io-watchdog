@@ -1,6 +1,6 @@
 INCLUDES = \
     -I$(top_srcdir)/src/lib \
-	-I$(top_srcdir)/src/conf
+    -I$(top_srcdir)/src/conf
 
 pkglib_LTLIBRARIES = \
     io-watchdog.la
