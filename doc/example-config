@@ -9,6 +9,9 @@
 # target = glob           Define default target
 # actions = action,...    Define default list of actions
 #
+# exact-timeout           Enable more precise watchdog timeouts
+#                          (incurs some performance impact)
+#
 # program pattern         Following settings only apply to programs
 #                          that match [pattern] (globbing pattern).
 #
