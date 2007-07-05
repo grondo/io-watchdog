@@ -42,6 +42,7 @@ struct io_watchdog_conf_entry {
     struct io_watchdog_timeout timeout;
     char * target;
     int    rank;
+    int    exact_timeout;
     List   actions;
 };
 
@@ -405,6 +406,15 @@ int io_watchdog_conf_set_timeout (io_watchdog_conf_t conf, char *timeout)
     return (0);
 }
 
+int io_watchdog_conf_set_exact_timeout (io_watchdog_conf_t conf, int exact)
+{
+    if (!conf || !conf->current)
+        return (-1);
+
+    conf->current->exact_timeout = exact;
+    return 0;
+}
+
 int io_watchdog_conf_set_actions (io_watchdog_conf_t conf, char *actions)
 {
     List l;
@@ -512,6 +522,13 @@ int io_watchdog_conf_timeout_has_suffix (io_watchdog_conf_t conf)
     if (conf->current->timeout.str)
         return (conf->current->timeout.has_suffix);
     return (conf->default_entry->timeout.has_suffix);
+}
+
+int io_watchdog_conf_exact_timeout (io_watchdog_conf_t conf)
+{
+    if (conf->current)
+        return (conf->current->exact_timeout);
+    return (conf->default_entry->exact_timeout);
 }
 
 List io_watchdog_conf_actions (io_watchdog_conf_t conf)

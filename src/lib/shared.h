@@ -2,9 +2,11 @@
 #define _SHARED_H
 
 #include <sys/types.h>
+#include <sys/time.h>
 
 struct io_watchdog_shared_info {
 	unsigned int       flag;
+	struct timeval     lastio;
 	unsigned int       started;
 	unsigned int       exited;
 	unsigned long long nbytes;

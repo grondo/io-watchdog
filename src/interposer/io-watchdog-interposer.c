@@ -87,6 +87,9 @@ struct io_watchdog_ctx {
     struct io_watchdog_ops ops;
 
     const char *program;
+
+    int exact;
+    int verbose;
 };
 
 /******************************************************************************
@@ -156,11 +159,18 @@ static int process_env ()
 {
     const char *val;
 
+    ctx.verbose = 0;
+
     if ((val = getenv ("IO_WATCHDOG_SHARED_FILE"))) 
         ctx.shared_file = strdup (val);
 
-    if ((val = getenv ("IO_WATCHDOG_DEBUG"))) 
+    if ((val = getenv ("IO_WATCHDOG_DEBUG"))) {
         log_msg_set_verbose (atoi (val));
+        ctx.verbose = 1;
+    }
+
+    if ((val = getenv ("IO_WATCHDOG_EXACT")))
+        ctx.exact = 1;
 
     return (0);
 }
@@ -264,15 +274,15 @@ static char * scale (unsigned long long n)
     static char buf [1024];
     double val = 0.0;
     int i = 0;
-    int p = 1;
+    unsigned long p = 1;
     char * suffixes [] = { " bytes", "K", "M", "G", "T" };
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 5; i++) {
         if ((int) (n / (p*=1024)) == 0)
             break;
     }
 
-    val = (double) n / (p/1024.0);
+    val = ((double) n) / (p/1024.0);
 
     if (i > 1)
         snprintf (buf, sizeof (buf), "%.2f%s", val, suffixes [i]);
@@ -294,7 +304,8 @@ void __attribute__ ((destructor)) io_watchdog_exit (void)
     if (ctx.shared->server_pid > (pid_t) 0)
         kill (ctx.shared->server_pid, SIGKILL);
 
-    log_verbose ("Process wrote %s\n", scale (ctx.shared->nbytes));
+    if (ctx.verbose) 
+        log_verbose ("Process wrote %s\n", scale (ctx.shared->nbytes));
 
     io_watchdog_shared_region_destroy (ctx.shared_region);
 
@@ -314,6 +325,9 @@ static inline void register_write_activity (int n)
     ctx.shared->flag = 1;
     if (n > 0)
         ctx.shared->nbytes += n;
+
+    if (ctx.exact && (gettimeofday (&ctx.shared->lastio, NULL) < 0))
+        log_debug ("gettimeofday: %s\n", strerror (errno));
 }
 
 int vfprintf (FILE *fp, const char *fmt, va_list args)

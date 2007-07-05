@@ -12,6 +12,7 @@ void io_watchdog_conf_destroy (io_watchdog_conf_t conf);
 
 int io_watchdog_conf_new_program (io_watchdog_conf_t conf, char *prog);
 int io_watchdog_conf_set_timeout (io_watchdog_conf_t conf, char *timeout);
+int io_watchdog_conf_set_exact_timeout (io_watchdog_conf_t conf, int exact);
 int io_watchdog_conf_set_actions (io_watchdog_conf_t conf, char *actions);
 int io_watchdog_conf_set_target (io_watchdog_conf_t conf, char *target);
 int io_watchdog_conf_set_rank (io_watchdog_conf_t conf, int rank);
@@ -22,6 +23,7 @@ int io_watchdog_conf_set_current_program (io_watchdog_conf_t conf, char *prog);
 int          io_watchdog_conf_rank (io_watchdog_conf_t conf);
 double       io_watchdog_conf_timeout (io_watchdog_conf_t conf);
 const char * io_watchdog_conf_timeout_string (io_watchdog_conf_t conf);
+int          io_watchdog_conf_exact_timeout (io_watchdog_conf_t conf);
 int          io_watchdog_conf_timeout_has_suffix (io_watchdog_conf_t conf);
 const char * io_watchdog_conf_target (io_watchdog_conf_t conf);
 List         io_watchdog_conf_actions (io_watchdog_conf_t conf);

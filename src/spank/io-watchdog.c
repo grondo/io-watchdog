@@ -18,6 +18,7 @@ struct io_watchdog_options {
     unsigned int enabled:1;
 
     int  rank;
+    int  exact_timeout;
     char *action;
     char *timeout;
     char *debug;
@@ -36,6 +37,8 @@ static char io_watchdog_help [] =
                        `s' for seconds (the default), `m' for minutes,\n\
                        `h' for hours, or `d' for days. N may be an arbitrary\n\
                        floating point number. (default = 1h)\n\
+  exact[-timeout]      Use a more precise method for the watchdog timeout.\n\
+                       See the io-watchdog(1) man page for more information.\n\
   action=script        Run `script' if timeout is reached without any writes \n\
                        from rank N. (default = no action)\n\
   target=glob          Only target processes with names matching the shell\n\
@@ -108,7 +111,11 @@ static int handle_watchdog_arg (char *arg, void *unused)
         if (!valid_timeout_string (opts.timeout)) 
             return (-1);
     }
-    else if (strncmp (arg, "action=", 7) == 0) {
+    else if (  strncmp (arg, "exact-timeout", 13) == 0
+            || strncmp (arg, "exact", 5) == 0 )  {
+        opts.exact_timeout = 1;
+    }
+    else if (strncmp (arg, "action=", 7) == 0) { 
         opts.action = strdup (arg+7);
     }
     else if (strncmp (arg, "target=", 7) == 0) {
@@ -220,6 +227,9 @@ static int set_watchdog_environment (spank_t sp)
 
     if (opts.conf)
         do_setenv (sp, "IO_WATCHDOG_CONFIG", opts.conf);
+
+    if (opts.exact_timeout)
+        do_setenv (sp, "IO_WATCHDOG_EXACT", opts.exact_timeout);
 
     return (0);
 }

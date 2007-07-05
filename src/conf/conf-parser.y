@@ -22,6 +22,7 @@ int yydebug = 0;
 static int cf_action (char * name, char *val);
 static int cf_program (char *program);
 static int cf_timeout (char *timeout);
+static int cf_exact (char *exact);
 static int cf_rank (char *rank);
 static int cf_target (char *target);
 static int cf_actions ();
@@ -40,6 +41,7 @@ static int stringlist_append (char *string);
 %token RANK
 %token TARGET
 %token SEARCH
+%token EXACT_TIMEOUT
 
 
 %%
@@ -60,6 +62,8 @@ stmt    : ACTION STRING '=' STRING   { if (cf_action ($2, $4) < 0)   YYABORT; }
         | TIMEOUT '=' STRING         { if (cf_timeout ($3) < 0)      YYABORT; }
         | RANK '=' STRING            { if (cf_rank ($3) < 0)         YYABORT; }
         | TARGET '=' STRING          { if (cf_target ($3) < 0)       YYABORT; }
+        | EXACT_TIMEOUT              { if (cf_exact ("1") < 0)       YYABORT; }
+        | EXACT_TIMEOUT '=' STRING   { if (cf_exact ($3) < 0)        YYABORT; }
         ;
 
 actions : ACTIONS '=' list           { if (cf_actions () < 0)        YYABORT; }
@@ -168,8 +172,39 @@ static int cf_timeout (char *timeout)
 {
     int rc = io_watchdog_conf_set_timeout (conf, timeout);
     log_debug2 ("%s: %d: timeout = %s\n", cf_file (), cf_line (), timeout);
+
     free (timeout);
     return (rc);
+}
+
+static int cf_exact (char *exact)
+{
+    int val = -1;
+
+    if (exact == NULL)
+        val = 1;
+    else if (  strcmp (exact, "0") == 0
+            || strcasecmp (exact, "false") == 0
+            || strcasecmp (exact, "off") == 0
+            || strcasecmp (exact, "no") == 0)
+        val = 0;
+    else if (  strcmp (exact, "1") == 0
+            || strcasecmp (exact, "true") == 0
+            || strcasecmp (exact, "yes") == 0
+            || strcasecmp (exact, "on") == 0)
+        val = 1;
+    else 
+        log_err ("%s: %d: Invalid value for exact-timeout \"%s\"\n",
+                cf_file (), cf_line (), exact);
+
+    if (val < 0)
+        return (-1);
+
+    log_debug2 ("%s: %d: exact-timeout\n");
+
+    io_watchdog_conf_set_exact_timeout (conf, val);
+
+    return (0);
 }
 
 static int cf_rank (char *rank)

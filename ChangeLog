@@ -2,6 +2,17 @@
 
 	* io-watchdog.spec : Add BuildRequires.
 
+	* src/watchdog/io-watchdog.c, src/watchdog/io-watchdog.1.in,
+	  src/lib/shared.h, src/interposer/io-watchdog-interposer.c,
+	  src/conf/conf-parser.l, src/conf/conf-parser.y, src/conf/conf.c,
+	  src/conf/conf.h, src/spank/io-watchdog.c :
+	  Add support for more precise timeout handling in the IO watchdog.
+	  Optionally record a timestamp for the last write detected in
+	  the interposer, and use this information to sleep the correct
+	  amount of time in the io-watchdog server. Since this will incur
+	  some overhead, it is disabled by default, and enabled via
+	  the option --exact-timeout and config parameter exact-timeout.
+
 2007-01-17  Mark Grondona  <mgrondona@llnl.gov>
 
 	* : tag v0.4.

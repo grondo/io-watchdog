@@ -37,10 +37,11 @@ struct option opt_table [] = {
     { "list-actions", 0, NULL, 'l' },
     { "server",       0, NULL, 'S' },
     { "shared-file",  1, NULL, 'F' },
+    { "exact-timeout",0, NULL, 'e' },
     { NULL,           0, NULL, 0   }
 };
 
-const char * const opt_string = "hvlSa:t:T:r:F:f:";
+const char * const opt_string = "hvlSea:t:T:r:F:f:";
 
 #define USAGE "\
 Usage: %s [OPTIONS] [executable args...]\n\
@@ -55,6 +56,8 @@ Usage: %s [OPTIONS] [executable args...]\n\
                           time(1), as it avoids enabling the io-watchdog on \n\
                           the time process.\n\
   -r, --rank=N           Only target rank [N] (default = 0) of a SLURM job.\n\
+  -e, --exact-timeout    Use a more precise method for the watchdog timeout.\n\
+                          See the io-watchdog(1) man page for details.\n\
   \n\
   -f, --config=file      Specify alternate config file [file]\n\
   \n\
@@ -78,6 +81,7 @@ struct io_watchdog_options {
     char *                           config_file;
 
     double                           timeout;
+    unsigned int                     exact_timeout;
     int                              verbose;
     int                              rank;
     int                              timeout_has_suffix;
@@ -181,6 +185,9 @@ static void set_process_environment (struct prog_ctx *ctx)
 
     if (ctx->opts.target)
         setenv  ("IO_WATCHDOG_TARGET", ctx->opts.target, 1);
+
+    if (ctx->opts.exact_timeout)
+        setenv ("IO_WATCHDOG_EXACT", "1", 1);
 
 }
 
@@ -311,6 +318,9 @@ static void process_env (struct prog_ctx *ctx)
         }
     }
 
+    if ((val = getenv ("IO_WATCHDOG_EXACT")) && val[0] != '0')
+        ctx->opts.exact_timeout = 1;
+
     if ((val = getenv ("IO_WATCHDOG_ACTION")))
         ctx->opts.env_action_string = strdup (val);
 
@@ -366,6 +376,9 @@ static void apply_config (struct prog_ctx *ctx)
 
     if (!ctx->opts.target)
         ctx->opts.target = xstrdup (io_watchdog_conf_target (ctx->conf));
+
+    if (!ctx->opts.exact_timeout && io_watchdog_conf_exact_timeout (ctx->conf))
+        ctx->opts.exact_timeout = 1;
 }
 
 static void parse_cmdline (struct prog_ctx *ctx, int ac, char *av[])
@@ -393,6 +406,9 @@ static void parse_cmdline (struct prog_ctx *ctx, int ac, char *av[])
                                       &ctx->opts.timeout, 
                                       &ctx->opts.timeout_has_suffix) < 0)
                 log_fatal (1, "Invalid timeout string `%s'\n", optarg);
+            break;
+        case 'e':
+            ctx->opts.exact_timeout = 1;
             break;
         case 'a':
             ctx->opts.actions = 
@@ -715,6 +731,31 @@ static void wait_for_application (struct prog_ctx *ctx)
         xnanosleep (0.5);
 }
 
+static double get_next_timeout (struct prog_ctx *ctx)
+{
+    struct timespec ts, lastio, result;
+    double ago;
+
+    if (!timerisset (&ctx->shared->lastio) || !ctx->shared->flag)
+        return (ctx->opts.timeout);
+
+    if (gettime (&ts) < 0) {
+        log_err ("gettimeofday: %s\n", strerror (errno));
+        return (ctx->opts.timeout);
+    }
+
+    lastio.tv_sec = ctx->shared->lastio.tv_sec;
+    lastio.tv_nsec = ctx->shared->lastio.tv_usec * 1000;
+
+    if (!timespec_subtract (&result, &ts, &lastio))
+        return (0.0);
+
+    if ((ago = result.tv_sec + (result.tv_nsec / 1e9)) > ctx->opts.timeout)
+        return (0.0);
+
+    return (ctx->opts.timeout - ago);
+}
+
 static int io_watchdog_server (struct prog_ctx *ctx)
 {
     int warned = 0;
@@ -729,13 +770,17 @@ static int io_watchdog_server (struct prog_ctx *ctx)
                  getpid (), ctx->opts.timeout_string, timeout_units (ctx),
                  ctx->opts.timeout);
 
-    if (ctx->shared->exited)
+    if (ctx->shared->exited) {
+        log_verbose ("server: monitored process exited\n");
         exit (0);
+    }
 
     for (;;) {
+        double timeout = get_next_timeout (ctx);
+
+        log_debug2 ("nanosleep (%.3fs)\n", timeout);
         ctx->shared->flag = 0;
-        log_debug2 ("nanosleep (%.3fs)\n", ctx->opts.timeout);
-        xnanosleep (ctx->opts.timeout);
+        xnanosleep (timeout);
 
         if (ctx->shared->exited) {
             log_debug2 ("server: monitored process exited\n");

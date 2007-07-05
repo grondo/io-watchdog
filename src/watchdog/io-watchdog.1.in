@@ -12,17 +12,18 @@ io-watchdog \- IO Watchdog driver utility
 .SH DESCRIPTION
 The IO watchdog is a facility for monitoring user applications and 
 parallel jobs for hangs which typically have a side-effect of ceasing
-all IO in an application, particularly those that write to a log
-or data file in a cyclic fashion, such as once per compute cycle.
-The watchdog attempts to monitor all IO coming from an application
-and triggers a set of user-defined actions when IO has stopped
-for a configurable timeout period.
+all IO in an application (i.e. one that writes something to a log or
+data file during each cyle of computation.).  The watchdog attempts to 
+monitor all IO generated from an application and triggers a set of 
+user-defined actions when IO has stopped for a configurable timeout period.
 .PP
 The \fBio-watchdog\fR utility is used to start applications under the
 IO watchdog service and configure watchdog parameters. This utility
 is typically needed when a job is run outside SLURM. When jobs
 are run under SLURM, the \-\-io-watchdog option to \fBsrun\fR(1)
-can be used when the io-watchdog plugin is enabled.
+can be used when the io-watchdog plugin is enabled. The \fBsrun\fR
+option \-\-io-watchdog=help can be used to display a short help
+message for running the IO watchdog under SLURM.
 
 .SH OPTIONS
 .TP
@@ -65,6 +66,20 @@ as it avoids enabling the io watchdog on the \fBtime\fR process.
 .TP
 .BI "-r, --rank=" N
 Only target rank N (default = 0) of a SLURM job.
+
+.TP
+.BI "-e, --exact-timeout"
+Use a more precise method for the IO watchdog timeout. By default the
+IO watchdog uses a simple and very lightweight method for tracking IO
+in the interest of impacting the application as little as possible.
+The actual time at which the watchdog may timeout will be anywhere
+from N to 2*N, where N is the timeout period specified by the user.
+With the \fI\-\-exact-timeout\fR option, the IO watchdog will track
+the time of the last application write so that the timeout can be
+as exact as possible. However, this will affect IO performance, since
+a timestamp must be generated on every write call. The magnitude of
+the impact is dependent on the rate of calls to write, not necessarily
+the amount of data written.
 
 .SH SEE ALSO
 \fBio-watchdog.conf\fR(5) 
