@@ -10,6 +10,8 @@ Group: System Environment/Base
 Source: 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
+BuildRequires: bison flex slurm-devel
+
 ##############################################################################
 
 %description
@@ -22,7 +24,7 @@ actions when IO has stopped for a configurable timeout period.
 ##############################################################################
 
 %prep
-%setup
+%setup 
 ##############################################################################
 
 %build
