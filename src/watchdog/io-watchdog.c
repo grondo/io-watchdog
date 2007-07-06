@@ -37,11 +37,11 @@ struct option opt_table [] = {
     { "list-actions", 0, NULL, 'l' },
     { "server",       0, NULL, 'S' },
     { "shared-file",  1, NULL, 'F' },
-    { "exact-timeout",0, NULL, 'e' },
+    { "method",       1, NULL, 'm' },
     { NULL,           0, NULL, 0   }
 };
 
-const char * const opt_string = "hvlSea:t:T:r:F:f:";
+const char * const opt_string = "hvlSm:a:t:T:r:F:f:";
 
 #define USAGE "\
 Usage: %s [OPTIONS] [executable args...]\n\
@@ -56,8 +56,8 @@ Usage: %s [OPTIONS] [executable args...]\n\
                           time(1), as it avoids enabling the io-watchdog on \n\
                           the time process.\n\
   -r, --rank=N           Only target rank [N] (default = 0) of a SLURM job.\n\
-  -e, --exact-timeout    Use a more precise method for the watchdog timeout.\n\
-                          See the io-watchdog(1) man page for details.\n\
+  -m, --method=TYPE      Specify the method used for the watchdog timeout.\n\
+                          TYPE may be `sloppy' or `exact' (default = sloppy)\n\
   \n\
   -f, --config=file      Specify alternate config file [file]\n\
   \n\
@@ -81,6 +81,7 @@ struct io_watchdog_options {
     char *                           config_file;
 
     double                           timeout;
+    char *                           timeout_method;
     unsigned int                     exact_timeout;
     int                              verbose;
     int                              rank;
@@ -108,6 +109,7 @@ static void prog_ctx_init (struct prog_ctx *ctx, int ac, char *av []);
 static void prog_ctx_fini (struct prog_ctx *ctx);
 static void process_env (struct prog_ctx *ctx);
 static void parse_cmdline (struct prog_ctx *ctx, int ac, char *av []);
+static void set_timeout_method (struct prog_ctx *ctx, const char *method);
 static int  io_watchdog_server (struct prog_ctx *ctx);
 static int  check_user_actions (struct prog_ctx *ctx);
 static void list_all_actions (struct prog_ctx *ctx);
@@ -377,8 +379,10 @@ static void apply_config (struct prog_ctx *ctx)
     if (!ctx->opts.target)
         ctx->opts.target = xstrdup (io_watchdog_conf_target (ctx->conf));
 
-    if (!ctx->opts.exact_timeout && io_watchdog_conf_exact_timeout (ctx->conf))
+    if (!ctx->opts.timeout_method 
+       && io_watchdog_conf_exact_timeout (ctx->conf)) {
         ctx->opts.exact_timeout = 1;
+    }
 }
 
 static void parse_cmdline (struct prog_ctx *ctx, int ac, char *av[])
@@ -407,8 +411,8 @@ static void parse_cmdline (struct prog_ctx *ctx, int ac, char *av[])
                                       &ctx->opts.timeout_has_suffix) < 0)
                 log_fatal (1, "Invalid timeout string `%s'\n", optarg);
             break;
-        case 'e':
-            ctx->opts.exact_timeout = 1;
+        case 'm':
+            ctx->opts.timeout_method = strdup (optarg);
             break;
         case 'a':
             ctx->opts.actions = 
@@ -473,6 +477,8 @@ static void parse_cmdline (struct prog_ctx *ctx, int ac, char *av[])
         ctx->opts.actions = list_split_append (ctx->opts.actions, ",:", 
                                                ctx->opts.env_action_string);
 
+    set_timeout_method (ctx, ctx->opts.timeout_method);
+
     apply_config (ctx);
 
     if (ctx->opts.server_only && av [optind])
@@ -512,6 +518,22 @@ static int check_user_actions (struct prog_ctx *ctx)
     if (!ctx->opts.actions)
         return (0);
     return (list_for_each (ctx->opts.actions, (ListForF) check_action, ctx));
+}
+
+static void set_timeout_method (struct prog_ctx *ctx, const char *method)
+{
+    if (!method)
+        return;
+
+    if (strcmp (method, "sloppy") == 0)
+        return;
+
+    if (strcmp (method, "exact") == 0) {
+        ctx->opts.exact_timeout = 1;
+        return;
+    }   
+
+    log_fatal (1, "Invalid timeout method \"%s\" specified.\n", method);
 }
 
 

@@ -34,7 +34,7 @@ actions         { return ACTIONS; }
 timeout         { return TIMEOUT; }
 rank            { return RANK; }
 target          { return TARGET; }
-exact-timeout   { return EXACT_TIMEOUT; }
+timeout-method  { return METHOD; }
 =               { return '='; }
 
 [^=;, \t\r\n]+  {

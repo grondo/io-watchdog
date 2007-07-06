@@ -44,10 +44,13 @@ it can be 's' for seconds (the default), 'm' for minutes, 'h' for
 hours, or 'd' for days. N may be an arbitrary floating point 
 number.
 .TP
-\fBexact-timeout\fR [ = \fI0|1\fR]
-Use a more precise method for the IO watchdog timeout. See the 
-documentation for the \fI\-\-exact-timeout\fR option in the 
-\fBio-watchdog\fR(1) man page for more information.
+\fBtimeout-method\fR = \fITYPE\fR
+Specify an alternate method for the IO watchdog timeout.
+Valid values for \fITYPE\fR are currently \fIsloppy\fR 
+and \fIexact\fR. The \fIexact\fR method uses a more precise
+algorithm for calculating the IO watchdog timeout, but may 
+cause some performance impact. The default value is 
+\fIsloppy\fR.
 .TP
 \fBactions\fR = \fRNAME\fR[,\fINAME\fR,...]
 Set the list of IO watchdog actions to \fINAME\fR. Multiple actions

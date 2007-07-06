@@ -68,18 +68,21 @@ as it avoids enabling the io watchdog on the \fBtime\fR process.
 Only target rank N (default = 0) of a SLURM job.
 
 .TP
-.BI "-e, --exact-timeout"
-Use a more precise method for the IO watchdog timeout. By default the
-IO watchdog uses a simple and very lightweight method for tracking IO
-in the interest of impacting the application as little as possible.
-The actual time at which the watchdog may timeout will be anywhere
-from N to 2*N, where N is the timeout period specified by the user.
-With the \fI\-\-exact-timeout\fR option, the IO watchdog will track
-the time of the last application write so that the timeout can be
-as exact as possible. However, this will affect IO performance, since
-a timestamp must be generated on every write call. The magnitude of
-the impact is dependent on the rate of calls to write, not necessarily
-the amount of data written.
+.BI "-m, --method=" TYPE
+Specify an alternate method for the IO watchdog timeout.  Valid values for
+\fITYPE\fR are \fIsloppy\fR or \fIexact\fR.  By default the IO watchdog
+uses the \fIsloppy\fR method, which is a simple and very lightweight
+method for tracking IO, and thus has very little impact on application
+performance. With the \fIsloppy\fR method, however, the actual time at
+which the watchdog will time out may be anywhere from N to 2*N, where N is
+the timeout period selected by the user.  When the \fIexact\fR timeout
+method is selected, the IO watchdog timestamps application IO which
+allows more precise calculation of the next timeout interval. However,
+the \fIexact\fR method will have a greater impact on application write
+performace, because an extra call to \fIgettimeofday\fR(2) is generated
+for every write call.  The performance impact of the \fIexact\fR method
+is dependent on the rate of calls to write, not necessarily the amount
+of data written.
 
 .SH SEE ALSO
 \fBio-watchdog.conf\fR(5) 

@@ -3,6 +3,14 @@
 	* src/interposer/io-watchdog-interposer.c : 
 	  Ensure some stdio functions are not #defined, and undef them if so.
 
+	* src/watchdog/io-watchdog.c, src/watchdog/io-watchdog.1.in,
+	  src/conf/conf-parser.l, src/conf/conf-parser.y,
+	  src/conf/io-watchdog.conf.5.in :
+	  Change --exact-timeout option in io-watchdog to --method=exact,
+	  and exact-timeout keywork in io-watchdog.conf to timeout-method
+	  for possible expansion later.
+	  
+
 2007-07-05  Mark Grondona  <mgrondona@llnl.gov>
 
 	* io-watchdog.spec : Add BuildRequires.
