@@ -330,6 +330,9 @@ static inline void register_write_activity (int n)
         log_debug ("gettimeofday: %s\n", strerror (errno));
 }
 
+#if defined vfprintf
+#undef vfprintf
+#endif
 int vfprintf (FILE *fp, const char *fmt, va_list args)
 {
     int rc = -1;
@@ -339,6 +342,9 @@ int vfprintf (FILE *fp, const char *fmt, va_list args)
     return (rc);
 }
 
+#if defined vprintf
+#undef vprintf
+#endif
 int vprintf (const char *fmt, va_list args)
 {
     int rc = ((*ctx.ops.vprintf) (fmt, args));
@@ -347,6 +353,9 @@ int vprintf (const char *fmt, va_list args)
     return (rc);
 }
 
+#if defined fprintf
+#undef fprintf
+#endif
 int fprintf (FILE *fp, const char *fmt, ...)
 {
     int rc;
@@ -362,6 +371,9 @@ int fprintf (FILE *fp, const char *fmt, ...)
     return (rc);
 }
 
+#if defined printf
+#undef printf
+#endif
 int printf (const char *fmt, ...)
 {
     int rc;
