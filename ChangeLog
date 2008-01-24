@@ -1,3 +1,11 @@
+2008-01-24  Mark Grondona  <mgrondona@llnl.gov>
+
+	* src/interposer/io-watchdog-interposer.c (scale) : 
+	  Fix potential buffer overrun of scale suffix array (Coverity).
+
+	* src/interposer/io-watchdog-interposer.c : 
+	  Fix unused value when checking IO_WATCHDOG_EXACT (Coverity).
+
 2007-07-06  Mark Grondona  <mgrondona@llnl.gov>
 
 	* src/interposer/io-watchdog-interposer.c : 

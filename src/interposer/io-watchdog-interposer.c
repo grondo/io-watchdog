@@ -169,7 +169,7 @@ static int process_env ()
         ctx.verbose = 1;
     }
 
-    if ((val = getenv ("IO_WATCHDOG_EXACT")))
+    if ((val = getenv ("IO_WATCHDOG_EXACT")) && val[0] != '0')
         ctx.exact = 1;
 
     return (0);
@@ -275,7 +275,7 @@ static char * scale (unsigned long long n)
     double val = 0.0;
     int i = 0;
     unsigned long p = 1;
-    char * suffixes [] = { " bytes", "K", "M", "G", "T" };
+    char * suffixes [] = { " bytes", "K", "M", "G", "T", "P" };
 
     for (i = 0; i < 5; i++) {
         if ((int) (n / (p*=1024)) == 0)
