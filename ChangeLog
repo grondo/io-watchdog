@@ -1,3 +1,7 @@
+2008-09-27  Mark Grondona  <mgrondona@llnl.gov>
+
+	* : Update License information for release.
+
 2008-01-24  Mark Grondona  <mgrondona@llnl.gov>
 
 	* src/interposer/io-watchdog-interposer.c (scale) : 
