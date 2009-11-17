@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <time.h>
 
 
 #include "log_msg.h"
@@ -46,7 +47,7 @@ static char * shared_file_name_create (char *file)
     if (!(tmpdir = getenv ("TMPDIR"))) 
         tmpdir = "/tmp";
 
-    srand (getpid ());
+    srand (time (NULL));
 
     snprintf (buf, sizeof (buf), "%s/io-watchdog-%d-%04x", 
              tmpdir, (int) getpid (), rand ());
