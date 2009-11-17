@@ -39,10 +39,10 @@ SPANK_PLUGIN (io-watchdog, 1);
 
 struct io_watchdog_options {
     unsigned int enabled:1;
+    unsigned int persistent:1;
+    unsigned int exact_timeout:1;
 
-    int  rank;
-    int  exact_timeout;
-    int  persistent;
+    unsigned int  rank;
     char *action;
     char *timeout;
     char *debug;
