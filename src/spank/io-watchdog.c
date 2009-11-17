@@ -63,7 +63,8 @@ static char io_watchdog_help [] =
   exact[-timeout]      Use a more precise method for the watchdog timeout.\n\
                        See the io-watchdog(1) man page for more information.\n\
   action=script        Run `script' if timeout is reached without any writes \n\
-                       from rank N. (default = no action)\n\
+                       from rank N. For multiple actions, separate with a \n\
+                       colon (:). (default = no action)\n\
   target=glob          Only target processes with names matching the shell\n\
                        globbing pattern `glob' (See glob(7)). This is useful\n\
                        when running jobs under other commands like time(1)\n\
