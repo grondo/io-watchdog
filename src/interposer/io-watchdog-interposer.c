@@ -252,6 +252,7 @@ static void spawn_watchdog ()
 {
     pid_t pid;
     char *args [] = { "io-watchdog", "--server", "-F", NULL, NULL };
+    const char *path;
 
     unsetenv ("LD_PRELOAD");
 
@@ -264,7 +265,10 @@ static void spawn_watchdog ()
 
     io_watchdog_shared_region_destroy (ctx.shared_region);
 
-    if (execv (io_watchdog_path, args) < 0)
+    if (!(path = getenv ("IO_WATCHDOG_SERVER_PATH")))
+        path = io_watchdog_path;
+
+    if (execv (path, args) < 0)
         log_err ("exec: %s: %s\n", io_watchdog_path, strerror (errno));
     exit (1);
 }

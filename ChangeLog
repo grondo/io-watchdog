@@ -1,3 +1,10 @@
+2009-11-13  Mark Grondona  <mgrondona@llnl.gov>
+
+	* src/watchdog/io-watchdog.c :
+	  Allow default path to io-watchdog executable to be overridden
+	  by IO_WATCHDOG_SERVER_PATH environment variable. This is necessary
+	  for some of the testsuite tests.
+
 2009-11-12  Mark Grondona  <mgrondona@llnl.gov>
 
 	* io-watchdog.spec :
