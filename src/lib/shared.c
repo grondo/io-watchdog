@@ -54,6 +54,53 @@ static char * shared_file_name_create (char *file)
     return (strdup (buf));
 }
 
+static int shared_region_init (struct io_watchdog_shared_region *s)
+{
+    int err;
+    pthread_mutexattr_t   m_attr;
+    pthread_condattr_t    c_attr;
+
+    memset (s->shared, 0, sizeof (*s->shared));
+
+    err = pthread_mutexattr_init (&m_attr);
+    if (err != 0) {
+        log_err ("pthread_mutexattr_init: %s\n", strerror (err));
+        return (-1);
+    }
+
+    err = pthread_mutexattr_setpshared (&m_attr, PTHREAD_PROCESS_SHARED);
+    if (err != 0) {
+        log_err ("pthread_mutexattr_setpshared: %s\n", strerror (err));
+        return (-1);
+    }
+
+    err = pthread_mutex_init (&s->shared->mutex, &m_attr);
+    if (err != 0) {
+        log_err ("pthread_mutex_init: %s\n", strerror (err));
+        return (-1);
+    }
+
+    err = pthread_condattr_init (&c_attr);
+    if (err != 0) {
+        log_err ("pthread_condattr_init: %s\n", strerror (err));
+        return (-1);
+    }
+
+    err = pthread_condattr_setpshared (&c_attr, PTHREAD_PROCESS_SHARED);
+    if (err != 0) {
+        log_err ("pthread_condattr_setpshared: %s\n", strerror (err));
+        return (-1);
+    }
+
+    err = pthread_cond_init (&s->shared->cond, &c_attr);
+    if (err != 0) {
+        log_err ("pthread_cond_init: %s\n", strerror (err));
+        return (-1);
+    }
+
+    return (0);
+}
+
 struct io_watchdog_shared_region *
 io_watchdog_shared_region_create (char *file)
 {
@@ -87,7 +134,7 @@ io_watchdog_shared_region_create (char *file)
     }
 
     if (first)
-        memset (s->shared, 0, len);
+        shared_region_init (s);
     else
         unlink (s->path);
 
@@ -99,6 +146,22 @@ io_watchdog_shared_region_create (char *file)
 
     return (s);
 
+}
+
+int io_watchdog_shared_info_barrier (struct io_watchdog_shared_info *s)
+{
+    pthread_mutex_lock (&s->mutex);
+    if (s->barrier) {
+        s->barrier = 0;
+        pthread_cond_signal (&s->cond);
+    }
+    else {
+        s->barrier = 1;
+        pthread_cond_wait (&s->cond, &s->mutex);
+    }
+    pthread_mutex_unlock (&s->mutex);
+
+    return (0);
 }
 
 void io_watchdog_shared_region_destroy (struct io_watchdog_shared_region *s)

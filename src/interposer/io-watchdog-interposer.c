@@ -279,9 +279,11 @@ void __attribute__ ((constructor)) io_watchdog_init (void)
         spawn_watchdog ();
 
     ctx.shared->monitored_pid = getpid ();
-    ctx.shared->started = 1;
     ctx.shared->start_time = time (NULL);
     strncpy (ctx.shared->cmd, ctx.program, sizeof (ctx.shared->cmd) - 1);
+
+    log_debug ("synchronizing with watchdog...\n");
+    io_watchdog_shared_info_barrier (ctx.shared);
 
     unsetenv ("IO_WATCHDOG_SHARED_FILE");
 

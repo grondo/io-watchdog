@@ -783,8 +783,8 @@ static int invoke_watchdog_action (struct prog_ctx *ctx)
 static void wait_for_application (struct prog_ctx *ctx)
 {
     log_debug2 ("waiting for application...\n");
-    while (!ctx->shared->started)
-        xnanosleep (0.5);
+    io_watchdog_shared_info_barrier (ctx->shared);
+    log_debug2 ("synchronization complete.\n");
 }
 
 static double get_next_timeout (struct prog_ctx *ctx)

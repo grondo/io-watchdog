@@ -1,5 +1,12 @@
 2009-11-01  Mark Grondona  <mgrondona@llnl.gov>
 
+	* src/interposer/io-watchdog-interposer.c,
+	  src/lib/shared.c, src/lib/shared.h,
+	  src/watchdog/io-watchdog.c :
+	  Replace the sleep-and-check loop in io-watchdog server with
+	  a process-shared condition variable for shared memory
+	  synchronization.
+
 	* : Add autoconf check for pthreads library.
 
 	* : Re-run ./bootstrap.

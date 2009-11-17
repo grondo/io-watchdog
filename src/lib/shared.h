@@ -26,12 +26,15 @@
 
 #include <sys/types.h>
 #include <sys/time.h>
+#include <pthread.h>
 
 struct io_watchdog_shared_info {
-	unsigned int       flag;
+	pthread_mutex_t    mutex;
+	pthread_cond_t     cond;
+	unsigned int       barrier:1;
+	unsigned int       flag:1;
+	unsigned int       exited:1;
 	struct timeval     lastio;
-	unsigned int       started;
-	unsigned int       exited;
 	unsigned long long nbytes;
 	time_t             start_time; 
 	pid_t              monitored_pid;
@@ -47,5 +50,6 @@ struct io_watchdog_shared_region {
 
 struct io_watchdog_shared_region *io_watchdog_shared_region_create (char *file);
 void io_watchdog_shared_region_destroy (struct io_watchdog_shared_region *s);
+int io_watchdog_shared_info_barrier (struct io_watchdog_shared_info *s);
 
 #endif /* !_SHARED_H */
