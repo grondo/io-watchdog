@@ -136,7 +136,7 @@ static void set_timeout_method (struct prog_ctx *ctx, const char *method);
 static int  io_watchdog_server (struct prog_ctx *ctx);
 static int  check_user_actions (struct prog_ctx *ctx);
 static void list_all_actions (struct prog_ctx *ctx);
-static int  exec_user_args (struct prog_ctx *ctx);
+static void exec_user_args (struct prog_ctx *ctx);
 static int  shared_region_create (struct prog_ctx *ctx);
 static int  monitor_this_rank (struct prog_ctx *ctx);
 static void set_process_environment (struct prog_ctx *ctx);
@@ -156,7 +156,7 @@ int main (int ac, char *av[])
     parse_cmdline (&prog_ctx, ac, av);
 
     if (!monitor_this_rank (&prog_ctx))
-        status = exec_user_args (&prog_ctx);
+        exec_user_args (&prog_ctx);
     else if ((status = shared_region_create (&prog_ctx)))
         log_err ("Failed to create shared file.\n");
     else if (prog_ctx.opts.server_only) 
@@ -167,7 +167,7 @@ int main (int ac, char *av[])
         status = io_watchdog_server (&prog_ctx);
     else {
         set_process_environment (&prog_ctx);
-        status = exec_user_args (&prog_ctx);
+        exec_user_args (&prog_ctx);
     }
 
     prog_ctx_fini (&prog_ctx);
@@ -216,16 +216,14 @@ static void set_process_environment (struct prog_ctx *ctx)
 
 }
 
-static int exec_user_args (struct prog_ctx *ctx)
+static void exec_user_args (struct prog_ctx *ctx)
 {
     log_debug ("execing process `%s'\n", ctx->opts.argv [0]);
 
     if (execvp (ctx->opts.argv[0], ctx->opts.argv) < 0) {
        log_err ("exec: %s: %s\n", ctx->opts.argv[0], strerror (errno));
-       return (1);
+       exit (127);
     }
-
-    return (0);
 }
 
 static void io_watchdog_options_init (struct io_watchdog_options *opts)
