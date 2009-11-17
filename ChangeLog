@@ -1,5 +1,13 @@
 2009-11-01  Mark Grondona  <mgrondona@llnl.gov>
 
+	* src/api/Makefile.am,
+	  src/api/io-watchdog.h,
+	  src/api/libio-watchdog.c,
+	  src/interposer/io-watchdog-interposer.c,
+	  src/lib/shared.h, src/lib/shared.c,
+	  src/watchdog/io-watchdog.c :
+	  Add initial version of io-watchdog client API.
+
 	* src/interposer/io-watchdog-interposer.c,
 	  src/lib/shared.c, src/lib/shared.h,
 	  src/watchdog/io-watchdog.c :

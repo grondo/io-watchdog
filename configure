@@ -19500,7 +19500,7 @@ _ACEOF
 
 
 
-                                                                                          ac_config_files="$ac_config_files Makefile src/Makefile src/lib/Makefile src/conf/Makefile src/conf/io-watchdog.conf.5 src/spank/Makefile src/watchdog/Makefile src/watchdog/io-watchdog.1 src/interposer/Makefile"
+                                                                                                    ac_config_files="$ac_config_files Makefile src/Makefile src/lib/Makefile src/conf/Makefile src/conf/io-watchdog.conf.5 src/spank/Makefile src/watchdog/Makefile src/watchdog/io-watchdog.1 src/interposer/Makefile src/api/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -20082,6 +20082,7 @@ do
   "src/watchdog/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/watchdog/Makefile" ;;
   "src/watchdog/io-watchdog.1" ) CONFIG_FILES="$CONFIG_FILES src/watchdog/io-watchdog.1" ;;
   "src/interposer/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/interposer/Makefile" ;;
+  "src/api/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/api/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

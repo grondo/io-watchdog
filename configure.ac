@@ -66,6 +66,7 @@ AC_CONFIG_FILES([
    src/watchdog/Makefile
    src/watchdog/io-watchdog.1
    src/interposer/Makefile
+   src/api/Makefile
  ]
 )
 

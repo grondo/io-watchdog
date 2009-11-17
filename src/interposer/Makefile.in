@@ -196,7 +196,8 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 INCLUDES = \
-    -I$(top_srcdir)/src/lib
+    -I$(top_srcdir)/src/lib \
+    -I$(top_srcdir)/src/api
 
 lib_LTLIBRARIES = \
     io-watchdog-interposer.la

@@ -28,18 +28,34 @@
 #include <sys/time.h>
 #include <pthread.h>
 
+enum client_req {
+	IO_REQ_NONE = 0,
+	IO_REQ_GET_TIMEOUT,
+	IO_REQ_SET_TIMEOUT
+};
+
 struct io_watchdog_shared_info {
-	pthread_mutex_t    mutex;
-	pthread_cond_t     cond;
-	unsigned int       barrier:1;
-	unsigned int       flag:1;
-	unsigned int       exited:1;
-	struct timeval     lastio;
-	unsigned long long nbytes;
-	time_t             start_time; 
-	pid_t              monitored_pid;
-	pid_t              server_pid;
-	char               cmd [64];
+	pthread_mutex_t    mutex;           /*  Process-shared mutex              */
+	pthread_cond_t     cond;            /*  Process-shared condition var      */
+	unsigned int       barrier:1;       /*  Flag for interprocess barrier     */
+	unsigned int       flag:1;          /*  Flag for client write activity    */
+	unsigned int       exited:1;        /*  True if client has exited         */
+	struct timeval     lastio;          /*  Timestamp of last IO              */
+	unsigned long long nbytes;          /*  Count of bytes written            */
+	time_t             start_time;      /*  Client process start time         */
+	pid_t              monitored_pid;   /*  PID of client process             */
+	pid_t              server_pid;      /*  PID of io-watchdog server process */
+	char               cmd [64];        /*  Short command name of client      */
+
+	/*
+	 *  Client API members:
+	 */
+	enum client_req   req_type;         /*  Type of request from client       */
+
+	union {                             /*  Union of possible request data    */
+		double timeout;                 /*  io-watchdog timeout               */
+		char   data [256];              /*  Placeholder for future data       */
+	} info;
 };
 
 struct io_watchdog_shared_region {
@@ -50,6 +66,14 @@ struct io_watchdog_shared_region {
 
 struct io_watchdog_shared_region *io_watchdog_shared_region_create (char *file);
 void io_watchdog_shared_region_destroy (struct io_watchdog_shared_region *s);
+
 int io_watchdog_shared_info_barrier (struct io_watchdog_shared_info *s);
+
+int
+io_watchdog_shared_get_timeout (struct io_watchdog_shared_info *s, double *to);
+
+int
+io_watchdog_shared_set_timeout (struct io_watchdog_shared_info *s, double to);
+
 
 #endif /* !_SHARED_H */

@@ -47,6 +47,7 @@
 
 #include "log_msg.h"
 #include "shared.h"
+#include "io-watchdog.h"
 
 /******************************************************************************
  *  Typedefs of replaced functions
@@ -136,6 +137,33 @@ static struct io_watchdog_sym_info sym_info [] = {
     { NULL, NULL}
 };
 
+/******************************************************************************
+ *  Watchdog client API
+ ******************************************************************************/
+
+iow_err_t io_watchdog_set_timeout (double timeout)
+{
+    if (timeout < 0.0)
+        return EIOW_BAD_ARG;
+
+    if (io_watchdog_shared_set_timeout (ctx.shared, timeout) < 0)
+        return EIOW_ERROR;
+
+    return EIOW_SUCCESS;
+}
+
+iow_err_t io_watchdog_get_timeout (double *tp)
+{
+    if (tp == NULL)
+        return EIOW_BAD_ARG;
+
+    *tp = 0.0;
+
+    if (io_watchdog_shared_get_timeout (ctx.shared, tp) < 0)
+        return EIOW_ERROR;
+
+    return EIOW_SUCCESS;
+}
 
 /******************************************************************************
  *  Interposer Functions

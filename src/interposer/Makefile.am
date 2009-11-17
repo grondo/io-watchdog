@@ -1,5 +1,6 @@
 INCLUDES = \
-    -I$(top_srcdir)/src/lib
+    -I$(top_srcdir)/src/lib \
+    -I$(top_srcdir)/src/api
 
 lib_LTLIBRARIES = \
     io-watchdog-interposer.la

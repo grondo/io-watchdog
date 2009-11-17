@@ -616,6 +616,85 @@ static int gettime (struct timespec *ts)
     return (r);
 }
 
+static void update_timeout_env (struct prog_ctx *ctx)
+{
+    char buf [64];
+
+    snprintf (buf, 64, "%.3f", ctx->opts.timeout);
+    if (setenv ("IO_WATCHDOG_TIMEOUT", buf, 1) < 0)
+        log_err ("Failed to set IO_WATCHDOG_TIMEOUT=%s: %s\n",
+                buf, strerror (errno));
+}
+
+static void update_timeout (struct prog_ctx *ctx, double timeout)
+{
+    char buf [1024];
+
+    ctx->opts.timeout = timeout;
+
+    /*
+     *  Update timeout string:
+     */
+    if (ctx->opts.timeout_string)
+        free (ctx->opts.timeout_string);
+    snprintf (buf, sizeof (buf), "%.3fs", ctx->opts.timeout);
+    ctx->opts.timeout_string = strdup (buf);
+
+    /*
+     *  Update environment for action scripts
+     */
+    update_timeout_env (ctx);
+}
+
+static int client_timeout_wait (struct prog_ctx *ctx, struct timespec *ts)
+{
+    struct io_watchdog_shared_info *s = ctx->shared;
+
+    /*
+     *  First, check to make sure condition (a pending client request)
+     *   isn't already true, if not, then sleep until next timeout or
+     *   client request.
+     */
+    pthread_mutex_lock (&s->mutex);
+    if (s->req_type == IO_REQ_NONE) {
+        int rc = pthread_cond_timedwait (&s->cond, &s->mutex, ts);
+        /*
+         *  If we timed out or got an error return to caller immediately.
+         */
+        if (rc != 0) {
+            pthread_mutex_unlock (&s->mutex);
+            return (rc == ETIMEDOUT ? 0 : -1);
+        }
+    }
+
+    /*
+     *  Otherwise, we were signalled by the client and have to
+     *   process a request
+     */
+    log_debug ("Handling request %d\n", s->req_type);
+    switch (s->req_type) {
+        case IO_REQ_NONE:
+            break;
+        case IO_REQ_GET_TIMEOUT:
+            s->info.timeout = ctx->opts.timeout;
+            break;
+        case IO_REQ_SET_TIMEOUT:
+            update_timeout (ctx, s->info.timeout);
+            break;
+    }
+
+    /*
+     * Once the request is processed, reset req_type in the server
+     *  and wait for client at the barrier.
+     */
+    s->req_type = IO_REQ_NONE;
+    pthread_mutex_unlock (&s->mutex);
+
+    io_watchdog_shared_info_barrier (s);
+
+    return (1);
+}
+
 
 /* Taken from coreutils/lib:
    
@@ -626,9 +705,10 @@ static int gettime (struct timespec *ts)
    the maximum value for that interval.  Return -1 on failure
    (setting errno), 0 on success.  */
 
-static int xnanosleep (double seconds)
+static int xnanowait (struct prog_ctx *ctx, double seconds)
 {
     int overflow;
+    int rc;
     double ns;
     struct timespec ts_start;
     struct timespec ts_sleep;
@@ -686,26 +766,14 @@ static int xnanosleep (double seconds)
         ts_sleep.tv_nsec = ts_stop.tv_nsec = 999999999;
     }
 
-    while (nanosleep (&ts_sleep, NULL) != 0)
+    while ((rc = client_timeout_wait (ctx, &ts_stop)) != 0)
     {
-        if (errno != EINTR || gettime (&ts_start) != 0)
+        if (rc < 0)
             return -1;
-
-        /* POSIX.1-2001 requires that when a process is suspended, then
-           resumed, nanosleep (A, B) returns -1, sets errno to EINTR,
-           and sets *B to the time remaining at the point of resumption.
-           However, some versions of the Linux kernel incorrectly return
-           the time remaining at the point of suspension.  Work around
-           this bug by computing the remaining time here, rather than by
-           relying on nanosleep's computation.  */
-
-        if (! timespec_subtract (&ts_sleep, &ts_stop, &ts_start))
-            break;
     }
 
     return 0;
 }
-
 
 static void setup_server_environment (struct prog_ctx *ctx)
 {
@@ -728,10 +796,8 @@ static void setup_server_environment (struct prog_ctx *ctx)
     /*
      *  Set environment variables for actions
      */
-    snprintf (buf, 64, "%.3f", ctx->opts.timeout);
-    if (setenv ("IO_WATCHDOG_TIMEOUT", buf, 1) < 0)
-        log_err ("Failed to set IO_WATCHDOG_TIMEOUT=%s: %s\n",
-                buf, strerror (errno));
+    update_timeout_env (ctx);
+
     if (setenv ("IO_WATCHDOG_TARGET", ctx->shared->cmd, 1) < 0)
         log_err ("Failed to set IO_WATCHDOG_TARGET=%s: %s\n",
                 ctx->shared->cmd, strerror (errno));
@@ -834,9 +900,9 @@ static int io_watchdog_server (struct prog_ctx *ctx)
     for (;;) {
         double timeout = get_next_timeout (ctx);
 
-        log_debug2 ("nanosleep (%.3fs)\n", timeout);
         ctx->shared->flag = 0;
-        xnanosleep (timeout);
+        log_debug2 ("Next timeout in %.3fs\n", timeout);
+        xnanowait (ctx, timeout);
 
         if (ctx->shared->exited) {
             log_debug2 ("server: monitored process exited\n");

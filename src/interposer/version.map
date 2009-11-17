@@ -15,6 +15,9 @@
     _IO_putc;
     _IO_puts;
 
+    io_watchdog_get_timeout;
+    io_watchdog_set_timeout;
+
   local: 
      *;
 };

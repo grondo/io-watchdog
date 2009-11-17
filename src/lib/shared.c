@@ -164,6 +164,62 @@ int io_watchdog_shared_info_barrier (struct io_watchdog_shared_info *s)
     return (0);
 }
 
+int
+io_watchdog_shared_get_timeout (struct io_watchdog_shared_info *s, double *to)
+{
+    /*
+     *  Notify io-watchdog server of request type, wake the server,
+     *   and synchronize on our simple shared memory barrier:
+     */
+    pthread_mutex_lock (&s->mutex);
+
+    if (s->req_type != IO_REQ_NONE) {
+        pthread_mutex_unlock (&s->mutex);
+        return -EAGAIN;
+    }
+    s->req_type = IO_REQ_GET_TIMEOUT;
+
+    pthread_cond_signal (&s->cond);
+    pthread_mutex_unlock (&s->mutex);
+
+    /*
+     *  Wait for io-watchdog server to indcate it has filled in the
+     *   requested data, then read the data.
+     */
+    io_watchdog_shared_info_barrier (s);
+
+    pthread_mutex_lock (&s->mutex);
+    *to = s->info.timeout;
+    pthread_mutex_unlock (&s->mutex);
+
+    return (0);
+
+}
+
+int
+io_watchdog_shared_set_timeout (struct io_watchdog_shared_info *s, double to)
+{
+    /*
+     *  Set new timeout value in shared memory and signal
+     *   io-watchdog server to wake up.
+     */
+    pthread_mutex_lock (&s->mutex);
+
+    if (s->req_type != IO_REQ_NONE) {
+        pthread_mutex_unlock (&s->mutex);
+        return -EAGAIN;
+    }
+    s->req_type = IO_REQ_SET_TIMEOUT;
+    s->info.timeout = to;
+
+    pthread_cond_signal (&s->cond);
+    pthread_mutex_unlock (&s->mutex);
+
+    io_watchdog_shared_info_barrier (s);
+
+    return (0);
+}
+
 void io_watchdog_shared_region_destroy (struct io_watchdog_shared_region *s)
 {
     if (!s) return;
