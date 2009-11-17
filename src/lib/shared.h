@@ -24,6 +24,8 @@
 #ifndef _SHARED_H
 #define _SHARED_H
 
+#define USE_XOPEN
+
 #include <sys/types.h>
 #include <sys/time.h>
 #include <pthread.h>
@@ -37,7 +39,7 @@ enum client_req {
 struct io_watchdog_shared_info {
 	pthread_mutex_t    mutex;           /*  Process-shared mutex              */
 	pthread_cond_t     cond;            /*  Process-shared condition var      */
-	unsigned int       barrier:1;       /*  Flag for interprocess barrier     */
+	pthread_barrier_t  barrier;         /*  Process-shared barrier            */
 	unsigned int       flag:1;          /*  Flag for client write activity    */
 	unsigned int       exited:1;        /*  True if client has exited         */
 	struct timeval     lastio;          /*  Timestamp of last IO              */

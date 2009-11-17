@@ -1,3 +1,8 @@
+2009-11-17  Mark Grondona  <mgrondona@llnl.gov>
+
+	* src/lib/shared.h, src/lib/shared.c :
+	  Switch to pthread_barrier_t for shared mem barrier implementation.
+
 2009-11-13  Mark Grondona  <mgrondona@llnl.gov>
 
 	* src/watchdog/io-watchdog.c, src/watchdog/io-watchdog.1.in :

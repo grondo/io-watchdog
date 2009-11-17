@@ -60,6 +60,7 @@ static int shared_region_init (struct io_watchdog_shared_region *s)
     int err;
     pthread_mutexattr_t   m_attr;
     pthread_condattr_t    c_attr;
+    pthread_barrierattr_t b_attr;
 
     memset (s->shared, 0, sizeof (*s->shared));
 
@@ -96,6 +97,24 @@ static int shared_region_init (struct io_watchdog_shared_region *s)
     err = pthread_cond_init (&s->shared->cond, &c_attr);
     if (err != 0) {
         log_err ("pthread_cond_init: %s\n", strerror (err));
+        return (-1);
+    }
+
+    err = pthread_barrierattr_init (&b_attr);
+    if (err != 0) {
+        log_err ("pthread_barrierattr_init: %s\n", strerror (err));
+        return (-1);
+    }
+
+    err = pthread_barrierattr_setpshared (&b_attr, PTHREAD_PROCESS_SHARED);
+    if (err != 0) {
+        log_err ("pthread_barrierattr_setpshared: %s\n", strerror (err));
+        return (-1);
+    }
+
+    err = pthread_barrier_init (&s->shared->barrier, &b_attr, 2);
+    if (err != 0) {
+        log_err ("pthread_barrier_init: %s\n", strerror (err));
         return (-1);
     }
 
@@ -151,17 +170,11 @@ io_watchdog_shared_region_create (char *file)
 
 int io_watchdog_shared_info_barrier (struct io_watchdog_shared_info *s)
 {
-    pthread_mutex_lock (&s->mutex);
-    if (s->barrier) {
-        s->barrier = 0;
-        pthread_cond_signal (&s->cond);
+    int err = pthread_barrier_wait (&s->barrier);
+    if (err != 0)  {
+        errno = err;
+        return -1;
     }
-    else {
-        s->barrier = 1;
-        pthread_cond_wait (&s->cond, &s->mutex);
-    }
-    pthread_mutex_unlock (&s->mutex);
-
     return (0);
 }
 
