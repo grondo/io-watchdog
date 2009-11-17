@@ -51,7 +51,7 @@ NUMBER may be an arbitrary floating-point number.
 .TP
 .BI "-a, --action=" SCRIPT,...
 Run action SCRIPT on watchdog trigger. More than one action
-may be specified. An action should be either a full patch to
+may be specified. An action should be either a full path to
 a script, one of the scripts in the default or user-defined
 search path, or an action defined in the config file as 
 
