@@ -1,5 +1,7 @@
 2009-11-11  Mark Grondona  <mgrondona@llnl.gov>
 
+	* AUTHORS, NEWS : Added.
+
 	* tests/ :
 	  Add an intial testsuite for io-watchdog.
 	  

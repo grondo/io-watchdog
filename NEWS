@@ -1,0 +1,6 @@
+Version 0.7 (2009-11-11):
+ - Add io-watchdog client API to get/set current watchdog timeout interval.
+ - Fix io-watchdog process hang on exec(2) failure.
+ - Set IO_WATCHDOG_TIMEOUT and IO_WATCHDOG_TARGET in io-watchdog 
+   action scripts.
+ - Add a small testsuite to the io-watchdog distribution.
