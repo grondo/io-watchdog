@@ -1,5 +1,8 @@
 2009-11-12  Mark Grondona  <mgrondona@llnl.gov>
 
+	* io-watchdog.spec :
+	  Split io-watchdog rpms into -devel, -libs, and -slurm subpackages.
+
 	* src/spank/io-watchdog.c :
 	  Rearrange internal options structure for space effeciency.
 
