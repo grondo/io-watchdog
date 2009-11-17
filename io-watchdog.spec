@@ -10,7 +10,7 @@ Group: System Environment/Base
 Source: 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires: bison flex slurm-devel
+BuildRequires: bison flex slurm-devel expect
 
 %package devel
 Requires: %{name} = %{version}-%{release}
