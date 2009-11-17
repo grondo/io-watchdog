@@ -1,0 +1,122 @@
+.TH IO\-WATCHDOG 3 "@META_DATE@" "" "IO Watchdog"
+
+.SH NAME
+io_watchdog_get_timeout, io_watchdog_set_timeout \- IO Watchdog client functions
+
+.SH SYNOPSIS
+.nf
+.B #include <io-watchdog.h>
+.sp
+.BI "iow_err_t io_watchdog_get_timeout (double " *timeoutp );
+.sp
+.BI "iow_err_t io_watchdog_set_timeout (double " timeout );
+.sp
+.BI "const char * io_watchdog_strerror (iow_err_t " e );
+.sp
+.B cc ... -lio-watchdog
+.fi
+
+.SH DESCRIPTION
+These \fBio-watchdog\fR api functions are provided to allow clients
+of the \fBio-watchdog\fR(1) server to modify runtime parameters of
+the watchdog facility. Currently, the libio-watchdog library provides
+functions to get and set the current watchdog timeout, but more
+client functions may be added in the future.
+.PP
+The \fBio_watchdog_get_timeout\fR function returns the current watchdog
+timeout in seconds in the variable pointed to by the \fItimeoutp\fR
+parameter.
+.PP
+The \fBio_watchdog_set_timeout\fR function sets the io-watchdog timeout
+in seconds to the value of the \fItimeout\fR parameter.
+.PP
+Except for \fBio_watchdog_strerror\fR(), these io-watchdog client functions 
+are implemented as stubs in the \fBlibio-watchdog.so\fR shared library.
+These stubs always return \fBEIOW_NOT_RUNNING\fR, indicating that the
+calling process is not running under the io-watchdog server.
+When running under the io-watchdog, however, an \fIinterposer\fR library
+is loaded via \fBLD_PRELOAD\fR which contains the real implementation of
+these interfaces. This design allows applications that wish to make
+use of this API to link against \fBlibio-watchdog.so\fR without requiring
+the io-watchdog server to be active during every run.
+
+.SH RETURN VALUE
+The \fBio_watchdog_get_timeout\fR() and \fBio_watchdog_set_timeout\fR()
+functions return \fBEIOW_SUCCESS\fR on success; otherwise, an io-watchdog
+error number is returned. 
+.PP
+The \fBio_watchdog_strerror\fR() function
+returns a string representation of an io-watchdog error number. The
+returned string should not be modified or freed by the caller.
+
+.SH ERRORS
+.TP
+.B EIOW_SUCCESS
+Success.
+.TP
+.B EIOW_NOT_RUNNING
+The current process is not running under the io-watchdog.
+.TP
+.B EIOW_BAD_ARG
+Invalid argument.
+.TP
+.B EIOW_ERROR
+Generic error.
+
+.SH EXAMPLE
+The following example illustrates the use of the io-watchdog api to
+extend the current io-watchdog timeout by 30 seconds.
+.PP
+.nf
+#include <stdio.h>
+#include <io-watchdog.h>
+.sp
+....
+.sp
+int extend_watchdog_timeout (void)
+{
+	double     timeout;
+	iow_err_t  err;
+.sp
+	err = io_watchdog_get_timeout (&timeout);
+.sp
+	if (err != EIOW_SUCCESS) {
+		fprintf (stderr, "Error: io_watchdog_get_timeout: %s\\n",
+				io_watchdog_strerror (err));
+		return (-1);
+	}
+.sp
+	printf ("Current io-watchdog timeout is %.3fs\\n", timeout);
+.sp
+	timeout += 30.0;
+.sp
+	err = io_watchdog_set_timeout (timeout);
+.sp
+	if (err != EIOW_SUCCESS) {
+		fprintf (stderr, "Error: io_watchdog_set_timeout: %s\\n",
+				io_watchdog_strerror (err));
+		return (-1);
+	}
+.sp
+	printf ("io-watchdog timeout is now %.3fs\\n", timeout);
+.sp
+	return (0);
+}
+.fi
+
+.SH AUTHOR
+@META_AUTHOR@
+
+.SH COPYRIGHT
+Copyright (C) 2007-2009 Lawrence Livermore National Security, LLC.
+
+IO-Watchdog is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+.SH "SEE ALSO"
+.BR io-watchdog (1)
+.BR io-watchdog.conf (5)
+.PP
+\fBhttp://io-watchdog.googlecode.com\fR
