@@ -2,6 +2,8 @@
 
 	* : Update License information for release.
 
+	* : tag v0.6.
+
 2008-01-24  Mark Grondona  <mgrondona@llnl.gov>
 
 	* src/interposer/io-watchdog-interposer.c (scale) : 
