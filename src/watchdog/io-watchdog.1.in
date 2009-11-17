@@ -105,5 +105,16 @@ for every write call.  The performance impact of the \fIexact\fR method
 is dependent on the rate of calls to write, not necessarily the amount
 of data written.
 
+.TP
+.B "-p, --persistent"
+The \fBio-watchdog\fR server process will not exit after a watchdog
+timeout occurs. This will enable multiple timeouts and possibly
+multiple invocations of \fBio-watchdog\fR action scripts. The default
+behavior is to have the \fBio-watchdog\fR server process exit after
+the first timeout event. \fINOTE:\fR This does not necessarily mean
+that the monitored process itself has exited or been killed by the
+\fBio-watchdog\fR at this time.
+
+
 .SH SEE ALSO
 \fBio-watchdog.conf\fR(5) 

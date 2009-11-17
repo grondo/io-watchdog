@@ -1,3 +1,16 @@
+2009-11-12  Mark Grondona  <mgrondona@llnl.gov>
+
+	* src/spank/io-watchdog.c :
+	  Enable a "persist" parameter in the spank plugin.
+
+	* src/watchdog/io-watchdog.c, src/watchdog/io-watchdog.1.in:
+	  New parameter --persistent reenables the old (undesireable)
+	  behavior of io-watchdog process hanging around after first
+	  timeout event.
+
+	* src/watchdog/io-watchdog.c :
+	  Exit from io-watchdog server after first timeout event.
+
 2009-11-11  Mark Grondona  <mgrondona@llnl.gov>
 
 	* AUTHORS, NEWS : Added.

@@ -62,10 +62,11 @@ struct option opt_table [] = {
     { "server",       0, NULL, 'S' },
     { "shared-file",  1, NULL, 'F' },
     { "method",       1, NULL, 'm' },
+    { "persistent",   0, NULL, 'p' },
     { NULL,           0, NULL, 0   }
 };
 
-const char * const opt_string = "hvlSm:a:t:T:r:F:f:";
+const char * const opt_string = "hvlSpm:a:t:T:r:F:f:";
 
 #define USAGE "\
 Usage: %s [OPTIONS] [executable args...]\n\
@@ -82,6 +83,7 @@ Usage: %s [OPTIONS] [executable args...]\n\
   -r, --rank=N           Only target rank [N] (default = 0) of a SLURM job.\n\
   -m, --method=TYPE      Specify the method used for the watchdog timeout.\n\
                           TYPE may be `sloppy' or `exact' (default = sloppy)\n\
+  -p, --persistent       Continue running even after a timeout has occurred.\n\
   \n\
   -f, --config=file      Specify alternate config file [file]\n\
   \n\
@@ -110,6 +112,7 @@ struct io_watchdog_options {
     int                              verbose;
     int                              rank;
     int                              timeout_has_suffix;
+    unsigned int                     persistent;
 
     unsigned int                     server_only;
     char *                           target_program;             
@@ -381,6 +384,9 @@ static void process_env (struct prog_ctx *ctx)
 
     if ((val = getenv ("IO_WATCHDOG_CONFIG")))
         ctx->opts.config_file = strdup (val);
+
+    if ((val = getenv ("IO_WATCHDOG_PERSISTENT")) && val[0] != '0')
+        ctx->opts.persistent = 1;
 }
 
 static char * xstrdup (const char *str)
@@ -480,6 +486,8 @@ static void parse_cmdline (struct prog_ctx *ctx, int ac, char *av[])
             xfree (ctx->opts.config_file);
             ctx->opts.config_file = strdup (optarg);
             break;
+        case 'p':
+            ctx->opts.persistent = 1;
         case '?':
             if (optopt > 0)
                 log_err ("Invalid option \"-%c\"\n", optopt);
@@ -808,6 +816,7 @@ static void setup_server_environment (struct prog_ctx *ctx)
     unsetenv ("IO_WATCHDOG_TIMEOUT");
     unsetenv ("IO_WATCHDOG_ACTION");
     unsetenv ("IO_WATCHDOG_CONFIG");
+    unsetenv ("IO_WATCHDOG_PERSISTENT");
     unsetenv ("IO_WATCHDOG_SHARED_FILE");
 
     /*
@@ -897,8 +906,6 @@ static double get_next_timeout (struct prog_ctx *ctx)
 
 static int io_watchdog_server (struct prog_ctx *ctx)
 {
-    int warned = 0;
-
     ctx->shared->server_pid = getpid ();
 
     if (wait_for_exec_completion (ctx) < 0)
@@ -930,8 +937,13 @@ static int io_watchdog_server (struct prog_ctx *ctx)
 
         log_debug2 ("server: wakeup: flag = %d\n", ctx->shared->flag);
 
-        if (!ctx->shared->flag && !warned++) {
+        if (!ctx->shared->flag) {
            invoke_watchdog_action (ctx);
+           if (!ctx->opts.persistent) {
+               log_verbose ("server: Exiting.\n");
+               exit (124);
+           }
+           log_debug2 ("server: Running in persistent mode. Continuing...\n");
         }
 
     } 

@@ -42,6 +42,7 @@ struct io_watchdog_options {
 
     int  rank;
     int  exact_timeout;
+    int  persistent;
     char *action;
     char *timeout;
     char *debug;
@@ -70,6 +71,8 @@ static char io_watchdog_help [] =
                        when running jobs under other commands like time(1)\n\
                        so that the io-watchdog is not run on the time(1)\n\
                        process. (default = target all processes)\n\
+  persist              Do not terminate io-watchdog functionality after the\n\
+                       first timeout event.\n\
   debug=N              Set io watchdog debug level to N.\n\
   help                 Display this help message.\n";
 
@@ -134,6 +137,9 @@ static int handle_watchdog_arg (char *arg, void *unused)
         opts.timeout = strdup (arg+8);
         if (!valid_timeout_string (opts.timeout)) 
             return (-1);
+    }
+    else if (strncmp (arg, "persist", 7) == 0) {
+        opts.persistent = 1;
     }
     else if (  strncmp (arg, "exact-timeout", 13) == 0
             || strncmp (arg, "exact", 5) == 0 )  {
@@ -253,7 +259,11 @@ static int set_watchdog_environment (spank_t sp)
         do_setenv (sp, "IO_WATCHDOG_CONFIG", opts.conf);
 
     if (opts.exact_timeout)
-        do_setenv (sp, "IO_WATCHDOG_EXACT", opts.exact_timeout);
+        do_setenv (sp, "IO_WATCHDOG_EXACT", "1");
+
+    if (opts.persistent)
+        do_setenv (sp, "IO_WATCHDOG_EXACT", "1");
+
 
     return (0);
 }
