@@ -14,6 +14,7 @@ TESTS_ENVIRONMENT = \
 TESTS = \
 	check-timeout.sh \
 	check-get-set-timeout.sh \
+	check-ld-preload.sh \
 	check-action-environment.expect
 
 check_PROGRAMS = \

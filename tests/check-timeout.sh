@@ -1,23 +1,27 @@
 #!/bin/sh
 
+. ${SRCDIR}/functions
+
 WAIT_TIME=22
 
-echo "Checking basic timeout functionality of io-watchdog..."
+log_msg "Checking basic timeout functionality of io-watchdog..."
 
+exec 3>&2
+[ ${VERBOSE-0} -lt 2 ] && exec >/dev/null 2>/dev/null 
 $WATCHDOG --action=${ACTIONDIR}/kill-process --timeout=1s sleep 30 &
 PID=$!
 
 #
 #  sleep for WAIT_TIME seconds, then kill PID with SIGALRM
 #
-(sleep $WAIT_TIME; echo $PID timed out, killing it; kill -ALRM $PID ) &
+(sleep $WAIT_TIME; log_msg $PID timed out, killing it; kill -ALRM $PID ) &
 SLEEP_PID=$!
 
 wait $PID 2>&1 >/dev/null
 
 if [ $? -eq 142 ]; then
-   echo "Error: Command killed by SIGALRM" >&2
-   exit 1
+   exec 2>&3
+   log_fatal "Error: Command killed by SIGALRM"
 fi
 
 #

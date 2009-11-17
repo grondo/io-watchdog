@@ -1,0 +1,18 @@
+#
+#  Calculate V based on VERBOSE setting:
+#
+for i in $(seq 3 ${VERBOSE-0}); do
+   V="${V--v}${V+v}"
+done
+
+#
+#  Prefix for log output
+#
+PROG=$(basename $0)
+
+
+log_msg()     { [ ${VERBOSE-0} -gt 0 ] && echo "$PROG: $@" >&2; }
+log_verbose() { [ ${VERBOSE-0} -gt 1 ] && log_msg "$@" >&2; }
+log_debug()   { [ ${VERBOSE-0} -gt 2 ] && log_msg "$@" >&2; }
+log_err()     { echo "$PROG: Error: $@" >&2; }
+die()         { echo "$PROG: Fatal: $@" >&2; }
