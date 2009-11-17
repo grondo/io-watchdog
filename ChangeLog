@@ -1,5 +1,7 @@
 2009-11-17  Mark Grondona  <mgrondona@llnl.gov>
 
+	* : tag v0.7.
+
 	* tests/functions, tests/check-ld-preload.sh :
 	  Other testsuite fixes.
 

@@ -1,6 +1,10 @@
-Version 0.7 (2009-11-11):
+Version 0.7 (2009-11-17):
  - Add io-watchdog client API to get/set current watchdog timeout interval.
- - Fix io-watchdog process hang on exec(2) failure.
- - Set IO_WATCHDOG_TIMEOUT and IO_WATCHDOG_TARGET in io-watchdog 
-   action scripts.
+ - Add -q, --quiet option to io-watchdog(1).
+ - Set IO_WATCHDOG_TIMEOUT and IO_WATCHDOG_TARGET in io-watchdog action scripts.
+ - Fix io-watchdog hangs on exec(2) failure.
+ - The io-watchdog now exits by default after the first timeout event. A
+    new option --persistent is available to get the old behavior. Note
+    that the user process will continue running after the io-watchdog exits.
+ - Split io-watchdog RPM into libs, devel, and slurm subpackages.
  - Add a small testsuite to the io-watchdog distribution.
