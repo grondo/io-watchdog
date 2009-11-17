@@ -33,6 +33,9 @@ Display a summary of the command-line options.
 .BI "-v, --verbose"
 Increase the verbosity of the io watchdog.
 .TP
+.BI "-q, --quiet"
+Decrease the verbosity of the io watchdog.
+.TP
 .BI "-l, --list-actions"
 List pre-defined system and user actions then exit. System actions
 are those scripts found in the default search path, or any search

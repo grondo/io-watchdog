@@ -53,6 +53,7 @@
 struct option opt_table [] = {
     { "help",         0, NULL, 'h' },
     { "verbose",      0, NULL, 'v' },
+    { "quiet",        0, NULL, 'q' },
     { "action",       1, NULL, 'a' },
     { "target",       1, NULL, 'T' },
     { "timeout",      1, NULL, 't' },
@@ -66,7 +67,7 @@ struct option opt_table [] = {
     { NULL,           0, NULL, 0   }
 };
 
-const char * const opt_string = "hvlSpm:a:t:T:r:F:f:";
+const char * const opt_string = "hvqlSpm:a:t:T:r:F:f:";
 
 #define USAGE "\
 Usage: %s [OPTIONS] [executable args...]\n\
@@ -90,6 +91,7 @@ Usage: %s [OPTIONS] [executable args...]\n\
   -l, --list-actions     Print list of pre-defined actions and exit.\n\
   \n\
   -v, --verbose          Increase io-watchdog verbosity.\n\
+  -q, --quiet            Decrease io-watchdog verbosity.\n\
   -h, --help             Display this message.\n"
 
 
@@ -211,7 +213,8 @@ static void set_process_environment (struct prog_ctx *ctx)
     } else
         setenv ("LD_PRELOAD", "io-watchdog-interposer.so", 1);
 
-    setenvi ("IO_WATCHDOG_DEBUG", ctx->opts.verbose);
+    if (ctx->opts.verbose > 0)
+        setenvi ("IO_WATCHDOG_DEBUG", ctx->opts.verbose);
 
     setenv  ("IO_WATCHDOG_SHARED_FILE", ctx->shared_region->path, 1);
 
@@ -449,6 +452,9 @@ static void parse_cmdline (struct prog_ctx *ctx, int ac, char *av[])
         case 'v':
             ctx->opts.verbose++;
             break;
+        case 'q':
+            ctx->opts.verbose--;
+            break;
         case 't':
             xfree (ctx->opts.timeout_string);
             ctx->opts.timeout_string = strdup (optarg);
@@ -501,8 +507,10 @@ static void parse_cmdline (struct prog_ctx *ctx, int ac, char *av[])
     }
 
 
-    if (ctx->opts.verbose)
+    if (ctx->opts.verbose > 0)
         log_msg_set_verbose (ctx->opts.verbose);
+    else if (ctx->opts.verbose < 0)
+        log_msg_quiet ();
 
     if (io_watchdog_conf_parse_system (ctx->conf) < 0)
         log_fatal (1, "Failed to read default system configuration\n");

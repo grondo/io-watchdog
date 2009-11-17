@@ -1,5 +1,8 @@
 2009-11-13  Mark Grondona  <mgrondona@llnl.gov>
 
+	* src/watchdog/io-watchdog.c, src/watchdog/io-watchdog.1.in :
+	  Add -q, --quiet option to io-watchdog.
+
 	* src/watchdog/io-watchdog.c :
 	  Allow default path to io-watchdog executable to be overridden
 	  by IO_WATCHDOG_SERVER_PATH environment variable. This is necessary
