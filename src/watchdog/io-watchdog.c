@@ -672,11 +672,6 @@ static void update_timeout (struct prog_ctx *ctx, double timeout)
         free (ctx->opts.timeout_string);
     snprintf (buf, sizeof (buf), "%.3fs", ctx->opts.timeout);
     ctx->opts.timeout_string = strdup (buf);
-
-    /*
-     *  Update environment for action scripts
-     */
-    update_timeout_env (ctx);
 }
 
 static int client_timeout_wait (struct prog_ctx *ctx, struct timespec *ts)
@@ -827,11 +822,6 @@ static void setup_server_environment (struct prog_ctx *ctx)
     unsetenv ("IO_WATCHDOG_PERSISTENT");
     unsetenv ("IO_WATCHDOG_SHARED_FILE");
 
-    /*
-     *  Set environment variables for actions
-     */
-    update_timeout_env (ctx);
-
     if (setenv ("IO_WATCHDOG_TARGET", ctx->shared->cmd, 1) < 0)
         log_err ("Failed to set IO_WATCHDOG_TARGET=%s: %s\n",
                 ctx->shared->cmd, strerror (errno));
@@ -873,6 +863,11 @@ static int invoke_watchdog_action (struct prog_ctx *ctx)
 {
     log_err ("%s: Nothing written for %s%s. Timing out\n",
             ctx->shared->cmd, ctx->opts.timeout_string, timeout_units (ctx));
+
+    /*
+     *  Update environment for action scripts
+     */
+    update_timeout_env (ctx);
 
     log_verbose ("Invoking %d actions\n", list_count (ctx->opts.actions));
     list_for_each (ctx->opts.actions, (ListForF) run_action, ctx);

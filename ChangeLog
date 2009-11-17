@@ -1,5 +1,11 @@
 2009-11-17  Mark Grondona  <mgrondona@llnl.gov>
 
+	* src/watchdog/io-watchdog.c :
+	  Do not update IO_WATCHDOG_TIMEOUT in watchdog environment for
+	  each update of the timeout by the client API, as this leads
+	  to a memory leak. Instead, only update just before any action
+	  is called (just as the real value is needed).
+
 	* src/lib/shared.h, src/lib/shared.c :
 	  Switch to pthread_barrier_t for shared mem barrier implementation.
 
