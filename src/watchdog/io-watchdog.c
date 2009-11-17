@@ -854,8 +854,8 @@ static char * timeout_units (struct prog_ctx *ctx)
 
 static int invoke_watchdog_action (struct prog_ctx *ctx)
 {
-    log_err ("Nothing written for %s%s. Timing out\n", 
-            ctx->opts.timeout_string, timeout_units (ctx));
+    log_err ("%s: Nothing written for %s%s. Timing out\n",
+            ctx->shared->cmd, ctx->opts.timeout_string, timeout_units (ctx));
 
     log_verbose ("Invoking %d actions\n", list_count (ctx->opts.actions));
     list_for_each (ctx->opts.actions, (ListForF) run_action, ctx);
@@ -905,7 +905,6 @@ static int io_watchdog_server (struct prog_ctx *ctx)
         log_fatal (1, "Unable to exec process. Server exiting\n");
 
     wait_for_application (ctx);
-    log_msg_set_secondary_prefix (ctx->shared->cmd);
     setup_server_environment (ctx);
 
     log_verbose ("server process (%ld) started with timeout = (%s%s) %.3fs\n", 
