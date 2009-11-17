@@ -3,6 +3,7 @@
 #
 for i in $(seq 3 ${VERBOSE-0}); do
    V="${V--v}${V+v}"
+   #IO_WATCHDOG_DEBUG=$((${IO_WATCHDOG_DEBUG-0} + 1))
 done
 
 #
@@ -15,4 +16,4 @@ log_msg()     { [ ${VERBOSE-0} -gt 0 ] && echo "$PROG: $@" >&2; }
 log_verbose() { [ ${VERBOSE-0} -gt 1 ] && log_msg "$@" >&2; }
 log_debug()   { [ ${VERBOSE-0} -gt 2 ] && log_msg "$@" >&2; }
 log_err()     { echo "$PROG: Error: $@" >&2; }
-die()         { echo "$PROG: Fatal: $@" >&2; }
+die()         { echo "$PROG: Fatal: $@" >&2; exit 1; }

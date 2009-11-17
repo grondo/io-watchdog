@@ -13,12 +13,14 @@ TESTS_ENVIRONMENT = \
 
 TESTS = \
 	check-timeout.sh \
+	check-action-environment.expect \
+	check-api.sh \
 	check-get-set-timeout.sh \
-	check-ld-preload.sh \
-	check-action-environment.expect
+	check-ld-preload.sh
 
 check_PROGRAMS = \
-	get-set-timeout
+	get-set-timeout \
+	api-stress
 
 EXTRA_DIST = \
 	actions/check-env \
@@ -33,3 +35,12 @@ get_set_timeout_SOURCES = \
 
 get_set_timeout_LDADD = \
 	$(top_builddir)/src/api/libio-watchdog.la
+
+api_stress_SOURCES = \
+	$(top_srcdir)/src/lib/log_msg.c \
+	$(top_srcdir)/src/lib/log_msg.h \
+	$(srcdir)/api-stress.c
+
+api_stress_LDADD = \
+	$(top_builddir)/src/api/libio-watchdog.la
+

@@ -1,5 +1,11 @@
 2009-11-17  Mark Grondona  <mgrondona@llnl.gov>
 
+	* tests/functions, tests/check-ld-preload.sh :
+	  Other testsuite fixes.
+
+	* tests/Makefile.am, tests/api-stress.c, tests/check-api.sh :
+	  Add API stress test to testsuite.
+
 	* src/watchdog/io-watchdog.c :
 	  Do not update IO_WATCHDOG_TIMEOUT in watchdog environment for
 	  each update of the timeout by the client API, as this leads

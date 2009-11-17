@@ -35,7 +35,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = get-set-timeout$(EXEEXT)
+check_PROGRAMS = get-set-timeout$(EXEEXT) api-stress$(EXEEXT)
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -46,6 +46,9 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
+am_api_stress_OBJECTS = log_msg.$(OBJEXT) api-stress.$(OBJEXT)
+api_stress_OBJECTS = $(am_api_stress_OBJECTS)
+api_stress_DEPENDENCIES = $(top_builddir)/src/api/libio-watchdog.la
 am_get_set_timeout_OBJECTS = log_msg.$(OBJEXT) \
 	get-set-timeout.$(OBJEXT)
 get_set_timeout_OBJECTS = $(am_get_set_timeout_OBJECTS)
@@ -62,8 +65,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(get_set_timeout_SOURCES)
-DIST_SOURCES = $(get_set_timeout_SOURCES)
+SOURCES = $(api_stress_SOURCES) $(get_set_timeout_SOURCES)
+DIST_SOURCES = $(api_stress_SOURCES) $(get_set_timeout_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -194,9 +197,10 @@ TESTS_ENVIRONMENT = \
 
 TESTS = \
 	check-timeout.sh \
+	check-action-environment.expect \
+	check-api.sh \
 	check-get-set-timeout.sh \
-	check-ld-preload.sh \
-	check-action-environment.expect
+	check-ld-preload.sh
 
 EXTRA_DIST = \
 	actions/check-env \
@@ -209,6 +213,14 @@ get_set_timeout_SOURCES = \
 	$(srcdir)/get-set-timeout.c
 
 get_set_timeout_LDADD = \
+	$(top_builddir)/src/api/libio-watchdog.la
+
+api_stress_SOURCES = \
+	$(top_srcdir)/src/lib/log_msg.c \
+	$(top_srcdir)/src/lib/log_msg.h \
+	$(srcdir)/api-stress.c
+
+api_stress_LDADD = \
 	$(top_builddir)/src/api/libio-watchdog.la
 
 all: all-am
@@ -251,6 +263,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+api-stress$(EXEEXT): $(api_stress_OBJECTS) $(api_stress_DEPENDENCIES) 
+	@rm -f api-stress$(EXEEXT)
+	$(LINK) $(api_stress_LDFLAGS) $(api_stress_OBJECTS) $(api_stress_LDADD) $(LIBS)
 get-set-timeout$(EXEEXT): $(get_set_timeout_OBJECTS) $(get_set_timeout_DEPENDENCIES) 
 	@rm -f get-set-timeout$(EXEEXT)
 	$(LINK) $(get_set_timeout_LDFLAGS) $(get_set_timeout_OBJECTS) $(get_set_timeout_LDADD) $(LIBS)
@@ -261,6 +276,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-stress.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/get-set-timeout.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log_msg.Po@am__quote@
 
@@ -298,6 +314,20 @@ log_msg.obj: $(top_srcdir)/src/lib/log_msg.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/src/lib/log_msg.c' object='log_msg.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o log_msg.obj `if test -f '$(top_srcdir)/src/lib/log_msg.c'; then $(CYGPATH_W) '$(top_srcdir)/src/lib/log_msg.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/lib/log_msg.c'; fi`
+
+api-stress.o: $(srcdir)/api-stress.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT api-stress.o -MD -MP -MF "$(DEPDIR)/api-stress.Tpo" -c -o api-stress.o `test -f '$(srcdir)/api-stress.c' || echo '$(srcdir)/'`$(srcdir)/api-stress.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/api-stress.Tpo" "$(DEPDIR)/api-stress.Po"; else rm -f "$(DEPDIR)/api-stress.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/api-stress.c' object='api-stress.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o api-stress.o `test -f '$(srcdir)/api-stress.c' || echo '$(srcdir)/'`$(srcdir)/api-stress.c
+
+api-stress.obj: $(srcdir)/api-stress.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT api-stress.obj -MD -MP -MF "$(DEPDIR)/api-stress.Tpo" -c -o api-stress.obj `if test -f '$(srcdir)/api-stress.c'; then $(CYGPATH_W) '$(srcdir)/api-stress.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/api-stress.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/api-stress.Tpo" "$(DEPDIR)/api-stress.Po"; else rm -f "$(DEPDIR)/api-stress.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/api-stress.c' object='api-stress.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o api-stress.obj `if test -f '$(srcdir)/api-stress.c'; then $(CYGPATH_W) '$(srcdir)/api-stress.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/api-stress.c'; fi`
 
 get-set-timeout.o: $(srcdir)/get-set-timeout.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT get-set-timeout.o -MD -MP -MF "$(DEPDIR)/get-set-timeout.Tpo" -c -o get-set-timeout.o `test -f '$(srcdir)/get-set-timeout.c' || echo '$(srcdir)/'`$(srcdir)/get-set-timeout.c; \
