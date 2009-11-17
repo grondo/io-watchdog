@@ -1,5 +1,8 @@
 2009-11-12  Mark Grondona  <mgrondona@llnl.gov>
 
+	* src/lib/split.c :
+	  Fix unused variable warning.
+
 	* src/spank/io-watchdog.c :
 	  Enable a "persist" parameter in the spank plugin.
 

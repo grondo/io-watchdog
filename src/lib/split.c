@@ -76,7 +76,6 @@ List list_split(char *sep, char *str)
 {
     List new = list_create((ListDelF) free);
     char *tok;
-    char *cp;
 
     if (sep == NULL)
         sep = " \t";
