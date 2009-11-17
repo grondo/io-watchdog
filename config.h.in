@@ -87,3 +87,9 @@
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */
 #undef YYTEXT_POINTER
+
+/* Define to 1 if you plan to link against multithreaded code. */
+#undef _REENTRANT
+
+/* Define to 1 if you plan to link against multithreaded code. */
+#undef _THREAD_SAFE

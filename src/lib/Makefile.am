@@ -10,3 +10,6 @@ libcommon_la_SOURCES = \
     shared.h \
     log_msg.c \
     log_msg.h 
+
+libcommon_la_LIBADD = \
+	$(LIBPTHREAD)

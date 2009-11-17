@@ -13,4 +13,5 @@ io_watchdog_SOURCES = \
 
 io_watchdog_LDFLAGS = \
     $(top_srcdir)/src/lib/libcommon.la \
-    $(top_srcdir)/src/conf/libconf.la
+    $(top_srcdir)/src/conf/libconf.la \
+	$(LIBPTHREAD)

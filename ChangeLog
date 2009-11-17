@@ -1,5 +1,7 @@
 2009-11-01  Mark Grondona  <mgrondona@llnl.gov>
 
+	* : Add autoconf check for pthreads library.
+
 	* : Re-run ./bootstrap.
 
 2009-09-22  Mark Grondona  <mgrondona@llnl.gov>

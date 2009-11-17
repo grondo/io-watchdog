@@ -54,7 +54,7 @@ AM_CONDITIONAL(WITH_SPANK, test x"${ac_cv_header_slurm_spank_h}" != xno)
 #
 #
 #
-CFLAGS="-g -Wall"
+X_AC_CHECK_PTHREADS
 
 AC_CONFIG_FILES([
    Makefile

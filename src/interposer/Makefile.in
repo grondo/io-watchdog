@@ -39,8 +39,8 @@ host_triplet = @host@
 subdir = src/interposer
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_meta.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_check_pthreads.m4 \
+	$(top_srcdir)/config/x_ac_meta.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
@@ -55,10 +55,11 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
+am__DEPENDENCIES_1 =
 io_watchdog_interposer_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/lib/log_msg.lo \
 	$(top_srcdir)/src/lib/shared.lo \
-	$(top_srcdir)/src/conf/paths.lo
+	$(top_srcdir)/src/conf/paths.lo $(am__DEPENDENCIES_1)
 am_io_watchdog_interposer_la_OBJECTS = io-watchdog-interposer.lo
 io_watchdog_interposer_la_OBJECTS =  \
 	$(am_io_watchdog_interposer_la_OBJECTS)
@@ -116,6 +117,7 @@ LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
 LIBOBJS = @LIBOBJS@
+LIBPTHREAD = @LIBPTHREAD@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -208,7 +210,8 @@ io_watchdog_interposer_la_LIBADD = \
     -ldl \
     $(top_srcdir)/src/lib/log_msg.lo \
     $(top_srcdir)/src/lib/shared.lo \
-    $(top_srcdir)/src/conf/paths.lo
+    $(top_srcdir)/src/conf/paths.lo \
+	$(LIBPTHREAD)
 
 io_watchdog_interposer_la_SOURCES = \
     io-watchdog-interposer.c
