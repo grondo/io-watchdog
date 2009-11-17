@@ -1,6 +1,11 @@
 2009-11-03  Mark Grondona  <mgrondona@llnl.gov>
 
 	* src/watchdog/io-watchdog.c :
+	  Detect exec(2) failures in watchdog server by using a pipe
+	  throught which "child" (actually parent) communicates exec
+	  failure back to io-watchdog server.
+
+	* src/watchdog/io-watchdog.c :
 	  Do not return from exec_user_args. Exit with exit code 127
 	  on any failure to exec user process.
 

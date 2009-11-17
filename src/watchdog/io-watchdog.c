@@ -36,6 +36,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <assert.h>
+#include <fcntl.h>
 
 #include "conf.h"
 #include "split.h"
@@ -119,6 +120,7 @@ struct io_watchdog_options {
 struct prog_ctx {
     char *                           prog;
     io_watchdog_conf_t               conf;
+    int                              pipe[2];
     struct io_watchdog_options       opts;
     struct io_watchdog_shared_info   *shared;
     struct io_watchdog_shared_region *shared_region;
@@ -140,6 +142,8 @@ static void exec_user_args (struct prog_ctx *ctx);
 static int  shared_region_create (struct prog_ctx *ctx);
 static int  monitor_this_rank (struct prog_ctx *ctx);
 static void set_process_environment (struct prog_ctx *ctx);
+static int  wait_for_exec_completion (struct prog_ctx *ctx);
+static void notify_watchdog_of_exec_failure (struct prog_ctx *ctx, int status);
 
 /*****************************************************************************
  *  Functions
@@ -222,6 +226,7 @@ static void exec_user_args (struct prog_ctx *ctx)
 
     if (execvp (ctx->opts.argv[0], ctx->opts.argv) < 0) {
        log_err ("exec: %s: %s\n", ctx->opts.argv[0], strerror (errno));
+       notify_watchdog_of_exec_failure (ctx, 127);
        exit (127);
     }
 }
@@ -230,6 +235,13 @@ static void io_watchdog_options_init (struct io_watchdog_options *opts)
 {
     memset (opts, 0, sizeof (*opts));
     opts->actions = list_create ((ListDelF) free);
+}
+
+static void set_close_on_exec (int fd)
+{
+    if (fcntl (fd, F_SETFD, FD_CLOEXEC) < 0)
+        log_fatal (1, "failed to set close-on-exec for fd%d: %s\n",
+                fd, strerror (errno));
 }
 
 static void prog_ctx_init (struct prog_ctx *ctx, int ac, char *av[])
@@ -243,6 +255,13 @@ static void prog_ctx_init (struct prog_ctx *ctx, int ac, char *av[])
     log_msg_init (prog);
 
     io_watchdog_options_init (&ctx->opts);
+
+    if (pipe (ctx->pipe) < 0)
+        log_fatal (1, "failed to create exec status pipe: %s\n",
+                strerror (errno));
+
+    set_close_on_exec (ctx->pipe[0]);
+    set_close_on_exec (ctx->pipe[1]);
 
     if (conf_init (ctx) < 0)
         log_fatal (1, "failed to initialize defuault configuration.\n");
@@ -882,6 +901,9 @@ static int io_watchdog_server (struct prog_ctx *ctx)
 
     ctx->shared->server_pid = getpid ();
 
+    if (wait_for_exec_completion (ctx) < 0)
+        log_fatal (1, "Unable to exec process. Server exiting\n");
+
     wait_for_application (ctx);
     log_msg_set_secondary_prefix (ctx->shared->cmd);
     setup_server_environment (ctx);
@@ -929,6 +951,29 @@ static int shared_region_create (struct prog_ctx *ctx)
 
     ctx->shared = ctx->shared_region->shared;
     return (0);
+}
+
+static void notify_watchdog_of_exec_failure (struct prog_ctx *ctx, int status)
+{
+    write (ctx->pipe[1], (char *) &status, 1);
+}
+
+static int wait_for_exec_completion (struct prog_ctx *ctx)
+{
+    int rc;
+    char c;
+
+    close (ctx->pipe[1]);
+
+    while (((rc = read (ctx->pipe[0], &c, 1)) < 0) && (errno == EINTR)) {}
+
+    close (ctx->pipe[0]);
+
+    if (rc == 0) /*  exec() completed normally */
+        return (0);
+
+
+    return (-1);
 }
 
 /*
