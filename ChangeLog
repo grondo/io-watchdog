@@ -1,5 +1,9 @@
 2009-09-22  Mark Grondona  <mgrondona@llnl.gov>
 
+	* src/watchdog/io-watchdog.1.in,
+	  src/watchdog/io-watchdog.c :
+	  Set IO_WATCHDOG_TIMEOUT and IO_WATCHDOG_TARGET in action scripts.
+
 	* src/watchdog/io-watchdog.1.in :
 	  Fix typo in io-watchdog manpage.
 

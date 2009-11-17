@@ -57,6 +57,27 @@ search path, or an action defined in the config file as
 
  action name = "script args..."
 
+The following environment variables will be set by \fBio-watchdog\fR
+in each action script:
+.RS
+.TP
+.B "IO_WATCHDOG_TIMEOUT"
+The time in seconds of the current \fBio-watchdog\fR timeout.
+Note that this is not the amount of time since the last application
+write, but instead just the timeout value as set by the user. The
+\fBIO_WATCHDOG_TIMEOUT\fR value is expressed as a floating-point
+number because this is how the timeout is represented internally
+in \fBio-watchdog\fR (e.g. 2 minutes would be represented as
+"IO_WATCHDOG_TIMEOUT=120.000").
+.TP
+.B "IO_WATCHDOG_TARGET"
+The name of the process being monitored by the \fBio-watchdog\fR,
+and which presumably caused a timeout.
+.TP
+.B "IO_WATCHDOG_PID"
+The PID of the monitored process.
+.RE
+
 .TP
 .BI "-T, --target=" PATTERN
 Only target processes with names matching the shell globbing

@@ -726,6 +726,17 @@ static void setup_server_environment (struct prog_ctx *ctx)
     unsetenv ("IO_WATCHDOG_SHARED_FILE");
 
     /*
+     *  Set environment variables for actions
+     */
+    snprintf (buf, 64, "%.3f", ctx->opts.timeout);
+    if (setenv ("IO_WATCHDOG_TIMEOUT", buf, 1) < 0)
+        log_err ("Failed to set IO_WATCHDOG_TIMEOUT=%s: %s\n",
+                buf, strerror (errno));
+    if (setenv ("IO_WATCHDOG_TARGET", ctx->shared->cmd, 1) < 0)
+        log_err ("Failed to set IO_WATCHDOG_TARGET=%s: %s\n",
+                ctx->shared->cmd, strerror (errno));
+
+    /*
      * XXX: Add support for just removing ourselves from LD_PRELOAD
      */
     unsetenv ("LD_PRELOAD");
