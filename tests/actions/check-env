@@ -1,0 +1,12 @@
+#!/bin/sh
+prog=$(basename $0)
+die() { echo "$prog: $@" >&2; exit 1; }
+[ -n "$IO_WATCHDOG_TIMEOUT" ] ||  die "IO_WATCHDOG_TIMEOUT not set in action"
+[ -n "$IO_WATCHDOG_PID" ] ||      die "IO_WATCHDOG_TIMEOUT not set in action"
+[ -n "$IO_WATCHDOG_TARGET" ] ||   die "IO_WATCHDOG_TIMEOUT not set in action"
+
+echo "$prog: PID $IO_WATCHDOG_PID ($IO_WATCHDOG_TARGET) exited after ${IO_WATCHDOG_TIMEOUT}s."
+echo "$prog: Success"
+
+kill $IO_WATCHDOG_PID
+

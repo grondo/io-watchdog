@@ -1,0 +1,22 @@
+#!/usr/bin/expect
+
+set watchdog  "$env(WATCHDOG)"
+set action    "$env(ACTIONDIR)/check-env"
+set exit_code 1
+
+set timeout 5
+set watchdog_pid [ spawn $watchdog --timeout=0.1 --action=$action sleep 100 ]
+expect {
+	-re ".*check-env: Success" {
+		exit 0
+	}
+	timeout {
+		send_user "\nError: io-watchdog timed out\n"
+		catch {exec /bin/kill -9 $watchdog_pid }
+	}
+	eof {
+		wait
+	}
+}
+
+exit 1

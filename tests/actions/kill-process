@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "Killing PID $IO_WATCHDOG_PID"
+
+kill -9 $IO_WATCHDOG_PID

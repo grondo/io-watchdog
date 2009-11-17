@@ -1,3 +1,8 @@
+2009-11-11  Mark Grondona  <mgrondona@llnl.gov>
+
+	* tests/ :
+	  Add an intial testsuite for io-watchdog.
+	  
 2009-11-05  Mark Grondona  <mgrondona@llnl.gov>
 
 	* src/watchdog/io-watchdog.c :

@@ -197,7 +197,7 @@ CONFIG_STATUS_DEPENDENCIES = META
 EXTRA_DIST = AUTHORS COPYING ChangeLog DISCLAIMER \
                                 INSTALL NEWS README edac-utils.spec
 
-SUBDIRS = src
+SUBDIRS = src tests
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
