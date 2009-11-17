@@ -19,6 +19,12 @@ TESTS = \
 check_PROGRAMS = \
 	get-set-timeout
 
+EXTRA_DIST = \
+	actions/check-env \
+	actions/kill-process \
+	$(TESTS)
+
+
 get_set_timeout_SOURCES = \
 	$(top_srcdir)/src/lib/log_msg.c \
 	$(top_srcdir)/src/lib/log_msg.h \

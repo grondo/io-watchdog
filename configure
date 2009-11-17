@@ -2038,8 +2038,8 @@ fi
 
 
 # Define the identity of the package.
- PACKAGE=$PACKAGE
- VERSION=$VERSION
+ PACKAGE=$META_NAME
+ VERSION=$META_VERSION
 
 
 cat >>confdefs.h <<_ACEOF

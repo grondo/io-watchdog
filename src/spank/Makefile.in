@@ -55,7 +55,7 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(pkglibdir)"
 pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
-io_watchdog_la_DEPENDENCIES = $(top_srcdir)/src/conf/libconf.la
+io_watchdog_la_DEPENDENCIES = $(top_builddir)/src/conf/libconf.la
 am_io_watchdog_la_OBJECTS = io-watchdog.lo
 io_watchdog_la_OBJECTS = $(am_io_watchdog_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -190,6 +190,9 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+EXTRA_DIST = \
+	version.map
+
 INCLUDES = \
     -I$(top_srcdir)/src/lib \
     -I$(top_srcdir)/src/conf
@@ -198,12 +201,12 @@ pkglib_LTLIBRARIES = \
     io-watchdog.la
 
 io_watchdog_la_LDFLAGS = \
-    -Wl,--version-script=version.map \
+    -Wl,--version-script=$(srcdir)/version.map \
     -module \
     -avoid-version
 
 io_watchdog_la_LIBADD = \
-    $(top_srcdir)/src/conf/libconf.la
+    $(top_builddir)/src/conf/libconf.la
 
 io_watchdog_la_SOURCES = \
     io-watchdog.c

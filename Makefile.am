@@ -2,8 +2,8 @@
 
 ACLOCAL_AMFLAGS =               -I config
 CONFIG_STATUS_DEPENDENCIES =    META
-EXTRA_DIST =                    AUTHORS COPYING ChangeLog DISCLAIMER \
-                                INSTALL NEWS README edac-utils.spec
+EXTRA_DIST =                    META AUTHORS COPYING ChangeLog DISCLAIMER \
+                                INSTALL NEWS README io-watchdog.spec
 SUBDIRS =                       src tests
 
 distclean-local:

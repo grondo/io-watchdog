@@ -18,7 +18,7 @@ nodist_libconf_la_SOURCES = \
 	paths.c
 
 libconf_la_LIBADD = \
-	$(top_srcdir)/src/lib/libcommon.la -lfl 
+	$(top_builddir)/src/lib/libcommon.la -lfl 
 
 noinst_PROGRAMS = \
 	test
@@ -27,14 +27,14 @@ test_SOURCES = \
 	main.c
 
 test_LDADD = \
-	$(top_srcdir)/src/lib/libcommon.la \
-	$(srcdir)/libconf.la 
+	$(top_builddir)/src/lib/libcommon.la \
+	libconf.la
 
 conf-lexer.c : conf-parser.l
-	$(LEX) -oconf-lexer.c conf-parser.l
+	$(LEX) -oconf-lexer.c $(srcdir)/conf-parser.l
 
 conf-parser.c : conf-parser.y
-	$(YACC) -d -oconf-parser.c conf-parser.y
+	$(YACC) -d -oconf-parser.c $(srcdir)/conf-parser.y
 
 paths.c : $(top_srcdir)/META $(top_builddir)/config.h
 	@(echo "const char *io_watchdog_path = \"$(bindir)/io-watchdog\";" \

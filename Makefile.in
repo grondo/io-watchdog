@@ -39,7 +39,7 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure COPYING ChangeLog INSTALL \
+	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
 	config/config.guess config/config.sub config/depcomp \
 	config/install-sh config/ltmain.sh config/missing \
 	config/mkinstalldirs
@@ -194,8 +194,8 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 ACLOCAL_AMFLAGS = -I config
 CONFIG_STATUS_DEPENDENCIES = META
-EXTRA_DIST = AUTHORS COPYING ChangeLog DISCLAIMER \
-                                INSTALL NEWS README edac-utils.spec
+EXTRA_DIST = META AUTHORS COPYING ChangeLog DISCLAIMER \
+                                INSTALL NEWS README io-watchdog.spec
 
 SUBDIRS = src tests
 all: config.h

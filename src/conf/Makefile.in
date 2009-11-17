@@ -50,7 +50,7 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES = io-watchdog.conf.5
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libconf_la_DEPENDENCIES = $(top_srcdir)/src/lib/libcommon.la
+libconf_la_DEPENDENCIES = $(top_builddir)/src/lib/libcommon.la
 am_libconf_la_OBJECTS = conf-parser.lo conf-lexer.lo conf.lo
 nodist_libconf_la_OBJECTS = paths.lo
 libconf_la_OBJECTS = $(am_libconf_la_OBJECTS) \
@@ -58,8 +58,7 @@ libconf_la_OBJECTS = $(am_libconf_la_OBJECTS) \
 PROGRAMS = $(noinst_PROGRAMS)
 am_test_OBJECTS = main.$(OBJEXT)
 test_OBJECTS = $(am_test_OBJECTS)
-test_DEPENDENCIES = $(top_srcdir)/src/lib/libcommon.la \
-	$(srcdir)/libconf.la
+test_DEPENDENCIES = $(top_builddir)/src/lib/libcommon.la libconf.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -217,14 +216,14 @@ nodist_libconf_la_SOURCES = \
 	paths.c
 
 libconf_la_LIBADD = \
-	$(top_srcdir)/src/lib/libcommon.la -lfl 
+	$(top_builddir)/src/lib/libcommon.la -lfl 
 
 test_SOURCES = \
 	main.c
 
 test_LDADD = \
-	$(top_srcdir)/src/lib/libcommon.la \
-	$(srcdir)/libconf.la 
+	$(top_builddir)/src/lib/libcommon.la \
+	libconf.la
 
 EXTRA_DIST = \
 	conf-parser.l \
@@ -556,10 +555,10 @@ uninstall-man: uninstall-man5
 
 
 conf-lexer.c : conf-parser.l
-	$(LEX) -oconf-lexer.c conf-parser.l
+	$(LEX) -oconf-lexer.c $(srcdir)/conf-parser.l
 
 conf-parser.c : conf-parser.y
-	$(YACC) -d -oconf-parser.c conf-parser.y
+	$(YACC) -d -oconf-parser.c $(srcdir)/conf-parser.y
 
 paths.c : $(top_srcdir)/META $(top_builddir)/config.h
 	@(echo "const char *io_watchdog_path = \"$(bindir)/io-watchdog\";" \
