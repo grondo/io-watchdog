@@ -1,3 +1,8 @@
+Version 0.8 (2010-08-23):
+ - Fix bug in SLURM plugin which caused a failure of the --io-watchdog
+    option to invoke the io watchdog unless the 'rank' option was used. 
+ - Add log messages to SLURM plugin to aid debugging.
+
 Version 0.7 (2009-11-17):
  - Add io-watchdog client API to get/set current watchdog timeout interval.
  - Add -q, --quiet option to io-watchdog(1).

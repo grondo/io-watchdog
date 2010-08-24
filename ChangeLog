@@ -1,5 +1,7 @@
 2010-08-23  Mark Grondona  <mgrondona@llnl.gov>
 
+	* : tag v0.8.
+
 	* src/spank/io-watchdog.c :
 	  Enable debugging of the slurm plugin itself by initializing
 	  the io-watchdog log facility with prefix "io-watchdog.so[taskid]"
