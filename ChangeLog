@@ -1,3 +1,9 @@
+2010-08-23  Mark Grondona  <mgrondona@llnl.gov>
+
+	* src/spank/io-watchdog.c :
+	  Change 'rank' to a signed long since it is tested < 0 in the code.
+	  Fix for CHAOS bz#1031.
+
 2009-11-17  Mark Grondona  <mgrondona@llnl.gov>
 
 	* : tag v0.7.
