@@ -33,6 +33,7 @@
 #include "split.h"
 #include "list.h"
 #include "conf.h"
+#include "log_msg.h"  /* For debug-specific log messages */
 
 
 SPANK_PLUGIN (io-watchdog, 1);
@@ -41,6 +42,7 @@ struct io_watchdog_options {
     unsigned int enabled:1;
     unsigned int persistent:1;
     unsigned int exact_timeout:1;
+    unsigned int debugval;          /* Integer value of opts.debug below */
     int          rank;
 
     char *action;
@@ -80,6 +82,7 @@ static char io_watchdog_help [] =
 static struct io_watchdog_options opts = {
     .enabled = 0,
     .rank    = -1,
+    .debugval= 0,
     .action  = NULL,
     .timeout = NULL,
     .target  = NULL,
@@ -132,7 +135,7 @@ static int handle_watchdog_arg (char *arg, void *unused)
             slurm_error ("io-watchdog: Invalid rank `%s'\n", arg+5);
             return (-1);
         }
-    } 
+    }
     else if (strncmp (arg, "timeout=", 8) == 0) {
         opts.timeout = strdup (arg+8);
         if (!valid_timeout_string (opts.timeout)) 
@@ -153,6 +156,11 @@ static int handle_watchdog_arg (char *arg, void *unused)
     }
     else if (strncmp (arg, "debug=", 6) == 0) {
         opts.debug = strdup (arg+6);
+        if (str2uint (opts.debug, &opts.debugval) < 0) {
+            slurm_error ("io-watchdog: Invalid debug value `%s'\n",
+                    opts.debug);
+            return (-1);
+        }
     }
     else if (strncmp (arg, "conf=", 5) == 0) {
         opts.conf = strdup (arg+5);
@@ -214,6 +222,7 @@ static int io_watchdog_opt_process (int val, const char *optarg, int remote)
 
 static int do_setenv (spank_t sp, const char *name, const char *val)
 {
+    log_debug ("setenv: %s=%s\n");
     int rc = spank_setenv (sp, name, val, 1);
     if (rc != ESPANK_SUCCESS) {
         slurm_error ("Failed to set %s in task environment", name);
@@ -240,7 +249,7 @@ static int set_process_environment (spank_t sp)
 
 static int set_watchdog_environment (spank_t sp)
 {
-    if (opts.timeout) 
+    if (opts.timeout)
         do_setenv (sp, "IO_WATCHDOG_TIMEOUT", opts.timeout);
 
     if (opts.action)
@@ -287,6 +296,8 @@ static int spawn_watchdog (spank_t sp)
     if (pid > 0)
         return (0);
 
+    log_verbose ("Invoking io-watchdog server from %s\n",
+            io_watchdog_server_path ());
 
     if (execve (io_watchdog_server_path (), args, env) < 0)
         slurm_error ("io-watchdog: execve (%s): %m", args [0]);
@@ -326,9 +337,26 @@ int slurm_spank_task_init (spank_t sp, int ac, char **av)
 {
     int taskid;
     io_watchdog_conf_t conf;
+    char prefix [64];
 
     if (!opts.enabled)
         return (0);
+
+    if (spank_get_item (sp, S_TASK_GLOBAL_ID, &taskid) != ESPANK_SUCCESS) {
+        slurm_error ("io-watchdog: unable to get task id");
+        return (-1);
+    }
+
+    /*
+     *  Initialize debug logging for this plugin so that log messages
+     *   from the SLURM plugin versus the io-watchdog server and library
+     *   can be differentiated when debugging.
+     */
+    snprintf (prefix, sizeof (prefix), "io-watchdog.so[%d]", taskid);
+    log_msg_init (prefix);
+    log_msg_set_verbose (opts.debugval);
+
+    log_verbose ("Initializing task %d\n", taskid);
 
     conf = io_watchdog_conf_create ();
 
@@ -337,14 +365,8 @@ int slurm_spank_task_init (spank_t sp, int ac, char **av)
 
     io_watchdog_conf_destroy (conf);
 
-    if (spank_get_item (sp, S_TASK_GLOBAL_ID, &taskid) != ESPANK_SUCCESS) {
-        slurm_error ("io-watchdog: unable to get task id");
-        return (-1);
-    }
-
     if (taskid != opts.rank) {
-        slurm_info ("io-watchdog: this rank (%d) != %d. No action\n", 
-                    taskid, opts.rank);
+        log_verbose ("this rank (%d) != %d. No action\n", taskid, opts.rank);
         return (0);
     }
 

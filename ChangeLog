@@ -1,6 +1,11 @@
 2010-08-23  Mark Grondona  <mgrondona@llnl.gov>
 
 	* src/spank/io-watchdog.c :
+	  Enable debugging of the slurm plugin itself by initializing
+	  the io-watchdog log facility with prefix "io-watchdog.so[taskid]"
+	  using the supplied debug=N flag to --io-watchdog.
+
+	* src/spank/io-watchdog.c :
 	  Change 'rank' to a signed long since it is tested < 0 in the code.
 	  Fix for CHAOS bz#1031.
 
