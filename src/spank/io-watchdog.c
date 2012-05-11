@@ -327,6 +327,11 @@ static int read_and_apply_config (spank_t sp, io_watchdog_conf_t conf)
 
     io_watchdog_conf_set_current_program (conf, (opts.argv0 = argv[0]));
 
+    /*
+     *  The only configuration parameter we care about in the spank
+     *   plugin is the rank to target. The rest of the config will be
+     *   read and applied by the io-watchdog server.
+     */
     if (opts.rank < 0)
         opts.rank = io_watchdog_conf_rank (conf);
 
