@@ -97,7 +97,6 @@ rm -rf "$RPM_BUILD_ROOT"
 %doc AUTHORS
 %doc NEWS
 %doc COPYING
-%doc ChangeLog
 %doc README
 %doc doc/*
 %{_bindir}/*
