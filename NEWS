@@ -1,3 +1,6 @@
+Version 0.9 (2012-05-11):
+ - Read config files once per node instead of once per task in spank plugin.
+
 Version 0.8 (2010-08-23):
  - Fix bug in SLURM plugin which caused a failure of the --io-watchdog
     option to invoke the io watchdog unless the 'rank' option was used. 
