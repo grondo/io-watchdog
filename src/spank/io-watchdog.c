@@ -333,10 +333,22 @@ static int read_and_apply_config (spank_t sp, io_watchdog_conf_t conf)
     return (0);
 }
 
+int slurm_spank_user_init (spank_t sp, int ac, char **av)
+{
+    int rc;
+    io_watchdog_conf_t conf = io_watchdog_conf_create ();
+    if (conf == NULL) {
+        slurm_error ("io-watchdog: Failed to create conf object!");
+        return (-1);
+    }
+    rc = read_and_apply_config (sp, conf);
+    io_watchdog_conf_destroy (conf);
+    return (rc);
+}
+
 int slurm_spank_task_init (spank_t sp, int ac, char **av)
 {
     int taskid;
-    io_watchdog_conf_t conf;
     char prefix [64];
 
     if (!opts.enabled)
@@ -357,13 +369,6 @@ int slurm_spank_task_init (spank_t sp, int ac, char **av)
     log_msg_set_verbose (opts.debugval);
 
     log_verbose ("Initializing task %d\n", taskid);
-
-    conf = io_watchdog_conf_create ();
-
-    if (read_and_apply_config (sp, conf) < 0)
-        return (-1);
-
-    io_watchdog_conf_destroy (conf);
 
     if (taskid != opts.rank) {
         log_verbose ("this rank (%d) != %d. No action\n", taskid, opts.rank);
