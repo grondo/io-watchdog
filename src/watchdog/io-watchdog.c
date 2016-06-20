@@ -331,7 +331,7 @@ static int monitor_this_rank (struct prog_ctx *ctx)
     char *val;
     int rank;
 
-    if (!(val = getenv ("SLURM_PROCID")))
+    if (!(val = getenv ("SLURM_PROCID")) || !(val = getenv ("MPIRUN_RANK")))
         return (1);
     
     string_to_int (val, &rank);
