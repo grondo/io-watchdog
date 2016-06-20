@@ -37,11 +37,11 @@
 #include <signal.h>
 #include <fnmatch.h>
 #include <limits.h>
-#define __USE_GNU /* program_invocation_short_name */
+#define __USE_GNU /* program_invocation_short_name, RTLD_NEXT */
 #include <errno.h>
-#undef  __USE_GNU
 
 #include <dlfcn.h>
+#undef  __USE_GNU
 #include <glob.h>
 #include <time.h>
 
@@ -222,6 +222,30 @@ static int process_env ()
     return (0);
 }
 
+/*
+ * Fallback to RTDL_NEXT if we failed to find glibc, and if we have
+ *  the RTLD_NEXT define available.
+ */
+static void * rtld_next_fallback (void)
+{
+#ifdef RTLD_NEXT
+    return RTLD_NEXT;
+#else
+    return NULL;
+#endif /* RTLD_NEXT */
+}
+
+/*
+ *  Attempt to dlopen() libc.so. Old-style code used a glob to attempt to
+ *   load the most likely libc.so from /lib or /lib64. It is probably much
+ *   better to use RTLD_NEXT where that dlopen handle works as designed,
+ *   however, we don't do this by default in order to avoid changing
+ *   the libc symbols that were found on older systems.
+ *
+ *  Instead, if glob() or dlopen() fail for the old-style code, attempt
+ *   to fall back to RTLD_NEXT. Eventually the dlopen() shall be deprecated
+ *   in favor of the better RTLD_NEXT approach.
+ */
 static void * find_libc ()
 {
     glob_t gl;
@@ -229,12 +253,15 @@ static void * find_libc ()
     void *rv = NULL;
 
     if (glob ("/lib{64,}/libc.so*", GLOB_BRACE, NULL, &gl) != 0)
-        return (NULL);
+        return rtld_next_fallback ();
 
     while ((i < gl.gl_pathc) && !(rv = dlopen (gl.gl_pathv[i], RTLD_LAZY)))
             i++;
 
     globfree (&gl);
+
+    if (rv == NULL)
+        return rtld_next_fallback ();
 
     return (rv);
 }
