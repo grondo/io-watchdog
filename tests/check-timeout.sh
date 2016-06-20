@@ -21,7 +21,7 @@ wait $PID 2>&1 >/dev/null
 
 if [ $? -eq 142 ]; then
    exec 2>&3
-   log_fatal "Error: Command killed by SIGALRM"
+   die "Error: Command killed by SIGALRM"
 fi
 
 #
