@@ -10,8 +10,14 @@ addons:
   apt:
     packages:
       - expect
+      - gdb
+      - apport
 
 script:
+  - ulimit -c unlimited
   - ./configure
   - make
-  - make check
+  - src/watchdog/io-watchdog foo
+
+after_failure:
+  - sh ./backtrace-all.sh

@@ -163,6 +163,7 @@ int main (int ac, char *av[])
     prog_ctx_init (&prog_ctx, ac, av);
     process_env (&prog_ctx);
     parse_cmdline (&prog_ctx, ac, av);
+    parse_cmdline (NULL, ac, av);
 
     if (!monitor_this_rank (&prog_ctx))
         exec_user_args (&prog_ctx);
