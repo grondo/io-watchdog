@@ -23,6 +23,8 @@ script:
   - src/watchdog/io-watchdog foo
 
 after_failure:
-  - dmesg | grep Core
+  - dmesg
   - cat /proc/sys/kernel/core_pattern
+  - ls -l /usr/share/apport/apport
+  - find /var/crash
   - sh ./backtrace-all.sh
