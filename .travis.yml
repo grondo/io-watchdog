@@ -18,13 +18,16 @@ script:
   - export SEGFAULT_USE_ALTSTACK=1
   - export LIBC_FATAL_STDERR_=1
   - ulimit -c unlimited
+  - ulimit -a; ulimit -aH
   - ./configure
   - make
   - src/watchdog/io-watchdog foo
 
 after_failure:
-  - dmesg
+  - grep .  /etc/apport/*
+  - grep .  /etc/apport/*/*
+  - cat /usr/share/apport/apport
   - cat /proc/sys/kernel/core_pattern
   - ls -l /usr/share/apport/apport
-  - find /var/crash
+  - find / -name '*core'
   - sh ./backtrace-all.sh
