@@ -1,0 +1,8 @@
+on: pull_request
+jobs:
+  check-pr:
+    name: check PR commits
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@master
+     - uses: grondo/pr-validate-action@master
