@@ -18,7 +18,7 @@ the application's stderr, and invokes all user defined actions,
 which could include running a debugger on the application, sending
 email to the user, etc.
 
-Set up of the LD_PRELOAD library is facilitated with either the
+Set up of the `LD_PRELOAD` library is facilitated with either the
 io-watchdog(1) utility, or a SPANK plug-in for SLURM which adds
 a new --io-watchdog command line option to srun(1).  To enable
 the io-watchdog SLURM plugin, the following line must exist in
